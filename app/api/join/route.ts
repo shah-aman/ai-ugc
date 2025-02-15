@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
       dimensions,
     }: RequestBody = await request.json();
 
-    if (!mainVideoUrl || !script || !brollVideos) {
+    if (!scriptId || !mainVideoUrl || !script || !brollVideos) {
       return NextResponse.json(
         { error: "Missing required fields" },
         { status: 400 },
@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
       .eq("id", scriptId);
 
     if (updateError) {
-      throw new Error("Failed to update script");
+      throw new Error(`Failed to update script: ${updateError.message}`);
     }
 
     return NextResponse.json({

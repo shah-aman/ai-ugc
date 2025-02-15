@@ -8,8 +8,8 @@ import { zodResponseFormat } from "openai/helpers/zod";
 
 export async function generateScript(
   customer_intent: string,
-  product_research: string,
-  influencer_research: string,
+  product_research: object,
+  influencer_research: object,
 ): Promise<{
   unstructuredScript: string;
   structuredScript: ExtractStructuredScriptSchema;
@@ -36,6 +36,8 @@ export async function generateScript(
     throw new Error("No script generated");
   }
 
+  console.log("Unstructured script:", unstructuredScript);
+
   const structuredResponse = await openai.beta.chat.completions.parse({
     model: "gpt-4o-mini",
     messages: [
@@ -51,6 +53,8 @@ export async function generateScript(
   });
 
   const structuredScript = structuredResponse.choices[0].message.parsed;
+
+  console.log("Structured script:", structuredScript);
 
   if (!structuredScript) {
     throw new Error("No structured script generated");

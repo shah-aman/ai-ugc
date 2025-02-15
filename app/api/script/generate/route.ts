@@ -7,8 +7,8 @@ type RequestBody = {
     influencer_id: string;
 
     customer_intent: string;
-    product_research: string;
-    influencer_research: string;
+    product_research: object;
+    influencer_research: object;
 };
 
 export async function POST(request: Request) {
@@ -49,7 +49,7 @@ export async function POST(request: Request) {
                 product_link,
                 script_reasoning,
                 full_script,
-                structured_script,
+                structured_script: structured_script.script,
             })
             .select();
 
