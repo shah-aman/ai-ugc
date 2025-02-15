@@ -49,7 +49,7 @@ const adScenes = [
   },
 ];
 
-export default function VideoAdPage() {
+export function StoryboardView() {
   const handleAddScene = () => {
     console.log("HELLO");
   };

@@ -3,7 +3,10 @@
 import { Button } from "@/components/ui/button";
 import { defineStepper } from "@/components/ui/stepper";
 import { ProductView } from "./components/product-view";
-import { FinalVideoView } from "./components/final-video";
+import { FinalVideoView } from "./components/final-video-view";
+import { IntermediateVideoView } from "./components/intermediate-video-view";
+import { StoryboardView } from "./components/storyboard-view";
+import { StrategyView } from "./components/strategy-view";
 
 const {
   StepperProvider,
@@ -43,9 +46,9 @@ export default function StepperDemo() {
           <StepperPanel className="h-[200px] content-center rounded border bg-slate-50 p-8">
             {methods.switch({
               product: () => <ProductView />,
-              strategy: (step) => <Content id={step.id} />,
-              storyboard: (step) => <Content id={step.id} />,
-              "raw-video": (step) => <Content id={step.id} />,
+              strategy: () => <StrategyView />,
+              storyboard: () => <StoryboardView />,
+              "raw-video": () => <IntermediateVideoView />,
               "final-video": () => <FinalVideoView />,
             })}
           </StepperPanel>

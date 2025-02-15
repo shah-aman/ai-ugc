@@ -64,7 +64,7 @@ const influencers = [
   },
 ];
 
-export default function InfluencerPage() {
+export function StrategyView() {
   const handleAddInfluencer = () => {
     console.log("HEHEHHE");
   };

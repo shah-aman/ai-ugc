@@ -44,7 +44,7 @@ const scenes = [
   },
 ];
 
-export default function IntermediateVideoPage() {
+export function IntermediateVideoView() {
   const [currentScene, setCurrentScene] = useState(0);
 
   const handleExport = () => {
