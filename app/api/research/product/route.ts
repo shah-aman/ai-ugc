@@ -8,7 +8,7 @@ export async function POST(request: NextRequest) {
     if (!product_description) {
       return NextResponse.json(
         { error: "Product description is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
     if (error) {
       return NextResponse.json(
         { error: `Research failed: ${error}` },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
     console.error("Error in product research route:", error);
     return NextResponse.json(
       { error: "Failed to process request" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

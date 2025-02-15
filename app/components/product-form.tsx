@@ -1,19 +1,20 @@
 "use client";
 
 import { PlaceholdersAndVanishInput } from "@/components/ui/placeholders-and-vanish-input";
+import { useRouter } from "next/navigation";
+
+const PLACEHOLDER_LINKS = [
+  "https://a.co/d/fwhl29U",
+  "https://www.etsy.com/listing/624694625",
+];
 
 export function ProductForm() {
-  const placeholders = [
-    "https://a.co/d/fwhl29U",
-    "https://www.etsy.com/listing/624694625",
-  ];
+  const router = useRouter();
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log(e.target.value);
-  };
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("submitted");
+    const productUrl = e.target[0].value;
+    router.push(`/${encodeURIComponent(productUrl)}/product`);
   };
 
   return (
@@ -24,8 +25,8 @@ export function ProductForm() {
 
       <div className="w-[70dvw]">
         <PlaceholdersAndVanishInput
-          placeholders={placeholders}
-          onChange={handleChange}
+          placeholders={PLACEHOLDER_LINKS}
+          onChange={() => {}}
           onSubmit={onSubmit}
         />
       </div>
