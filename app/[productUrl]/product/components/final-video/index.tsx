@@ -13,7 +13,7 @@ const adDetails = {
     "This ad showcases our Premium Wireless Headphones as the ultimate solution for boosting focus and productivity in various work environments. It takes the viewer through a journey from a noisy, stressful workspace to a serene, focused state achieved by using our product.",
 };
 
-export default function FinalVideoPage() {
+export function FinalVideoView() {
   const handleShare = () => {
     console.log("YEYEYEY");
   };
