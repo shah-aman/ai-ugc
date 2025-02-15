@@ -3,6 +3,8 @@
 import { ProductGallery } from "./components/product-gallery";
 import { ProductInfo } from "./components/product-info";
 
+import { Skeleton } from "@/components/ui/skeleton";
+
 const productImages = [
   "https://m.media-amazon.com/images/I/61Ht6pj0JiL._AC_SX695_.jpg",
   "https://m.media-amazon.com/images/I/51odl4a-jPL._AC_SX695_.jpg",
@@ -27,7 +29,7 @@ export default function ProductPage() {
   const handleAddToCart = () => console.log("HELLOOO");
 
   return (
-    <div className="min-h-screen bg-[#09090B] text-white">
+    <div className="min-h-screen">
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="flex flex-col md:flex-row gap-8">
           <div className="w-full md:w-1/2">
