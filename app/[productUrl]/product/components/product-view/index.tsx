@@ -4,6 +4,7 @@ import { useParams } from "next/navigation";
 
 import { ProductGallery } from "./components/product-gallery";
 import { ProductInfo } from "./components/product-info";
+import { useProductContext } from "../../contexts/product-context";
 
 const productImages = [
   "https://m.media-amazon.com/images/I/61Ht6pj0JiL._AC_SX695_.jpg",
@@ -25,16 +26,9 @@ const productData = {
   ],
 };
 export function ProductView() {
-  // const router = useRouter();
-  const params = useParams<{ productUrl: string }>();
+  const context = useProductContext();
 
-  const productUrl = useMemo(
-    () => decodeURIComponent(params.productUrl),
-    [params],
-  );
-  console.log(productUrl);
-
-  const handleAddToCart = () => console.log("HELLOOO");
+  const handleAddToCart = () => console.log(context);
 
   return (
     <div className="min-h-screen">

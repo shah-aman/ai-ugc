@@ -7,6 +7,7 @@ import { FinalVideoView } from "./components/final-video-view";
 import { IntermediateVideoView } from "./components/intermediate-video-view";
 import { StoryboardView } from "./components/storyboard-view";
 import { StrategyView } from "./components/strategy-view";
+import { ProductContextProvider } from "./contexts/product-context";
 
 const {
   StepperProvider,
@@ -23,52 +24,50 @@ const {
   { id: "final-video", title: "Final Video" },
 );
 
-const Content = ({ id }: { id: string }) => {
-  return <p className="text-xl font-normal">Content for {id}</p>;
-};
-
 export default function StepperDemo() {
   return (
-    <StepperProvider className="space-y-4" variant="horizontal">
-      {({ methods }) => (
-        <>
-          <StepperNavigation>
-            {methods.all.map((step) => (
-              <StepperStep
-                key={step.id}
-                of={step.id}
-                onClick={() => methods.goTo(step.id)}
-              >
-                <StepperTitle>{step.title}</StepperTitle>
-              </StepperStep>
-            ))}
-          </StepperNavigation>
-          <StepperPanel className="h-[200px] content-center rounded border bg-slate-50 p-8">
-            {methods.switch({
-              product: () => <ProductView />,
-              strategy: () => <StrategyView />,
-              storyboard: () => <StoryboardView />,
-              "raw-video": () => <IntermediateVideoView />,
-              "final-video": () => <FinalVideoView />,
-            })}
-          </StepperPanel>
-          <StepperControls>
-            {!methods.isLast && (
-              <Button
-                variant="secondary"
-                onClick={methods.prev}
-                disabled={methods.isFirst}
-              >
-                {" "}
-                Previous{" "}
-              </Button>
-            )}
-            <Button onClick={methods.isLast ? methods.reset : methods.next}>
-              {methods.isLast ? "Reset" : "Next"}
-            </Button>{" "}
-          </StepperControls>{" "}
-        </>
-      )}
-    </StepperProvider>
+    <ProductContextProvider>
+      <StepperProvider className="space-y-4" variant="horizontal">
+        {({ methods }) => (
+          <>
+            <StepperNavigation>
+              {methods.all.map((step) => (
+                <StepperStep
+                  key={step.id}
+                  of={step.id}
+                  onClick={() => methods.goTo(step.id)}
+                >
+                  <StepperTitle>{step.title}</StepperTitle>
+                </StepperStep>
+              ))}
+            </StepperNavigation>
+            <StepperPanel className="h-[200px] content-center rounded border bg-slate-50 p-8">
+              {methods.switch({
+                product: () => <ProductView />,
+                strategy: () => <StrategyView />,
+                storyboard: () => <StoryboardView />,
+                "raw-video": () => <IntermediateVideoView />,
+                "final-video": () => <FinalVideoView />,
+              })}
+            </StepperPanel>
+            <StepperControls>
+              {!methods.isLast && (
+                <Button
+                  variant="secondary"
+                  onClick={methods.prev}
+                  disabled={methods.isFirst}
+                >
+                  {" "}
+                  Previous{" "}
+                </Button>
+              )}
+              <Button onClick={methods.isLast ? methods.reset : methods.next}>
+                {methods.isLast ? "Reset" : "Next"}
+              </Button>{" "}
+            </StepperControls>{" "}
+          </>
+        )}
+      </StepperProvider>
+    </ProductContextProvider>
   );
 }
