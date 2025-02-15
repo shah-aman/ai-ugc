@@ -2,7 +2,7 @@ const HEYGEN_API_KEY = process.env.HEYGEN_API_KEY;
 const HEYGEN_API_URL = "https://api.heygen.com/v2/video/generate";
 
 interface VideoGenerationPayload {
-  prompt: string;
+  script: string;
   avatarId: string;
   voiceId: string;
 }
@@ -15,7 +15,7 @@ interface VideoResponse {
 }
 
 export async function generateVideo({
-  prompt,
+  script,
   avatarId,
   voiceId,
 }: VideoGenerationPayload): Promise<VideoResponse> {
@@ -34,7 +34,7 @@ export async function generateVideo({
         voice: {
           type: "text",
           voice_id: voiceId,
-          input_text: prompt,
+          input_text: script,
         },
         background: {
           type: "color",

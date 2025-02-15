@@ -13,7 +13,7 @@ interface VideoStatusResponse {
 }
 
 export async function fetchVideoStatus(
-  videoId: string
+  videoId: string,
 ): Promise<VideoStatusResponse> {
   const response = await fetch(`${HEYGEN_STATUS_URL}?video_id=${videoId}`, {
     method: "GET",
@@ -32,7 +32,9 @@ export async function fetchVideoStatus(
 
 export async function pollVideoStatus(
   videoId: string,
-  shouldPoll: boolean = true
+  shouldPoll: boolean = true,
+  timeoutMs: number = TIMEOUT_MS,
+  pollingInterval: number = POLLING_INTERVAL,
 ) {
   if (!shouldPoll) {
     const response = await fetchVideoStatus(videoId);
@@ -49,10 +51,10 @@ export async function pollVideoStatus(
       return data;
     }
 
-    if (Date.now() - startTime > TIMEOUT_MS) {
+    if (Date.now() - startTime > timeoutMs) {
       throw new Error("Timeout waiting for video");
     }
 
-    await new Promise((resolve) => setTimeout(resolve, POLLING_INTERVAL));
+    await new Promise((resolve) => setTimeout(resolve, pollingInterval));
   }
 }
