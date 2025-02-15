@@ -1,28 +1,162 @@
-const productResearchPrompt = (product_description: string) => `
-You are a thorough product researcher analyzing a product for a UGC (User Generated Content, e.g. TikTok, Instagram Reels) video creator to create a video about the product.
+interface ResearchArea {
+  name: string;
+  description: string;
+  prompt: string;
+}
 
-Your task is to research and analyze the following product in detail:
-${product_description}
+const researchAreas: ResearchArea[] = [
+  {
+    name: 'keyFeatures',
+    description: 'Key Features & Technical Specifications',
+    prompt: `Analyze the product's key features and technical specifications in detail.
+Focus on:
+1. Core functionality and capabilities
+2. Technical specifications and performance metrics
+3. Design and build quality
+4. Innovative or unique features
+5. Integration capabilities
+6. Performance benchmarks (if applicable)
 
-Please provide a comprehensive analysis covering:
-1. Key Features & Benefits
-2. Target Market & Use Cases
-3. Price Point & Value   Proposition
-4. Unique Selling Points
-5. Common Pain Points it Solves
-6. Competitor Comparison
-7. Social Proof & Reviews (if available)
-8. Technical Specifications
-9. Usage Instructions
-10. Any Potential Drawbacks
+Format your response as JSON:
+{
+  "features": [
+    { "name": string, "description": string, "technicalDetails": string[] }
+  ],
+  "specifications": { [key: string]: string | number },
+  "innovations": string[],
+  "buildQuality": { "materials": string[], "durability": string }
+}`
+  },
+  {
+    name: 'marketAnalysis',
+    description: 'Target Market & Use Cases',
+    prompt: `Conduct a deep analysis of the target market and use cases.
+Focus on:
+1. Primary target demographics
+2. Secondary market opportunities
+3. User personas
+4. Common use cases
+5. Market size and potential
+6. Industry trends affecting adoption
 
-Format your response in a clear, structured way that a content creator can easily reference.
-Focus on authentic, relatable aspects that would resonate in a UGC video.
+Format your response as JSON:
+{
+  "primaryMarket": {
+    "demographics": string[],
+    "psychographics": string[],
+    "marketSize": string
+  },
+  "secondaryMarkets": [
+    { "segment": string, "opportunity": string }
+  ],
+  "userPersonas": [
+    { "type": string, "description": string, "needs": string[] }
+  ],
+  "useCases": [
+    { "scenario": string, "benefits": string[] }
+  ]
+}`
+  },
+  {
+    name: 'competitiveAnalysis',
+    description: 'Competitor Analysis & Market Position',
+    prompt: `Perform a detailed competitive analysis.
+Focus on:
+1. Direct competitors
+2. Indirect competitors
+3. Competitive advantages
+4. Market positioning
+5. Price comparison
+6. Feature comparison
 
-- Analyze deeper implications of product features
-- Identify hidden benefits and use cases
-- Spot potential concerns or limitations
-- Find unique angles for authentic storytelling
-`;
+Format your response as JSON:
+{
+  "directCompetitors": [
+    { 
+      "name": string,
+      "strengths": string[],
+      "weaknesses": string[],
+      "pricePoint": string
+    }
+  ],
+  "indirectCompetitors": [
+    {
+      "name": string,
+      "threatLevel": string,
+      "differentiators": string[]
+    }
+  ],
+  "marketPosition": {
+    "uniqueAdvantages": string[],
+    "challenges": string[],
+    "opportunities": string[]
+  }
+}`
+  },
+  {
+    name: 'painPoints',
+    description: 'Pain Points & Solutions',
+    prompt: `Analyze customer pain points and how the product addresses them.
+Focus on:
+1. Common customer problems
+2. How the product solves each issue
+3. Customer satisfaction metrics
+4. Areas for improvement
+5. User feedback analysis
 
-export { productResearchPrompt };
+Format your response as JSON:
+{
+  "painPoints": [
+    {
+      "problem": string,
+      "solution": string,
+      "effectiveness": string,
+      "userFeedback": string
+    }
+  ],
+  "satisfactionMetrics": {
+    "overallRating": string,
+    "keyMetrics": { [key: string]: string }
+  },
+  "improvementAreas": [
+    { "area": string, "suggestion": string }
+  ]
+}`
+  }
+];
+
+const consolidationPrompt = `
+Analyze and consolidate all research findings into a comprehensive product analysis.
+Use the provided research data to create a cohesive narrative that connects all aspects:
+- Key Features & Technical Specifications
+- Market Analysis
+- Competitive Landscape
+- Pain Points & Solutions
+
+Format your response as JSON:
+{
+  "productSummary": {
+    "overview": string,
+    "keyInsights": string[],
+    "marketOpportunity": string,
+    "competitivePosition": string,
+    "valueProposition": string
+  },
+  "detailedAnalysis": {
+    "features": object,
+    "market": object,
+    "competition": object,
+    "painPoints": object
+  },
+  "recommendations": {
+    "marketingAngles": string[],
+    "targetAudience": string[],
+    "contentStrategy": {
+      "keyMessages": string[],
+      "suggestedTopics": string[]
+    }
+  },
+  "citations": string[]
+}`;
+
+export { researchAreas, consolidationPrompt };
