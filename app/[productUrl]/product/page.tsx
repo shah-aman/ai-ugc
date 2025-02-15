@@ -39,18 +39,15 @@ const {
   StepperStep,
   StepperTitle,
 } = defineStepper(
-  { id: "step-1", title: "Step 1" },
-  { id: "step-2", title: "Step 2" },
-  { id: "step-3", title: "Step 3" },
+  { id: "product", title: "Product" },
+  { id: "strategy", title: "Marketing Strategy" },
+  { id: "storyboard", title: "Storyboard" },
+  { id: "raw-video", title: "Raw Video" },
+  { id: "final-video", title: "Final Video" },
 );
 
 const Content = ({ id }: { id: string }) => {
-  return (
-    <StepperPanel className="h-[200px] content-center rounded border bg-slate-50 p-8">
-      {" "}
-      <p className="text-xl font-normal">Content for {id}</p>{" "}
-    </StepperPanel>
-  );
+  return <p className="text-xl font-normal">Content for {id}</p>;
 };
 
 export default function StepperDemo() {
@@ -69,11 +66,15 @@ export default function StepperDemo() {
               </StepperStep>
             ))}
           </StepperNavigation>
-          {methods.switch({
-            "step-1": (step) => <Content id={step.id} />,
-            "step-2": (step) => <Content id={step.id} />,
-            "step-3": (step) => <Content id={step.id} />,
-          })}
+          <StepperPanel className="h-[200px] content-center rounded border bg-slate-50 p-8">
+            {methods.switch({
+              product: (step) => <Content id={step.id} />,
+              strategy: (step) => <Content id={step.id} />,
+              storyboard: (step) => <Content id={step.id} />,
+              "raw-video": (step) => <Content id={step.id} />,
+              "final-video": (step) => <Content id={step.id} />,
+            })}
+          </StepperPanel>
           <StepperControls>
             {!methods.isLast && (
               <Button
