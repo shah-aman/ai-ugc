@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { research, error } = await researchProduct(product_description);
+    const { summary, citations, error } = await researchProduct(product_description);
 
     if (error) {
       return NextResponse.json(
@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    return NextResponse.json({ research });
+    return NextResponse.json({ summary, citations });
   } catch (error) {
     console.error("Error in product research route:", error);
     return NextResponse.json(
