@@ -7,7 +7,7 @@ import { cookies } from 'next/headers';
 // import { createServerClient } from '@supabase/ssr';
 
 export const metadata: Metadata = {
-  title: "AI UGC",
+  title: "Supernova",
   description: "High quality UGC for your brand",
 };
 
