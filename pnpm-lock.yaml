@@ -11,6 +11,9 @@ importers:
       '@radix-ui/react-slot':
         specifier: ^1.1.2
         version: 1.1.2(@types/react@19.0.8)(react@19.0.0)
+      '@stepperize/react':
+        specifier: ^5.1.0
+        version: 5.1.0(react@19.0.0)
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
@@ -364,6 +367,14 @@ packages:
 
   '@rushstack/eslint-patch@1.10.5':
     resolution: {integrity: sha512-kkKUDVlII2DQiKy7UstOR1ErJP8kUKAQ4oa+SQtM0K+lPdmmjj0YnnxBgtTVYH7mUKtbsxeFC9y0AmK7Yb78/A==}
+
+  '@stepperize/core@1.2.0':
+    resolution: {integrity: sha512-H3a14uq21HI2hemkjz/zh5qGWZfx87XOu/T+MKwkW3ZkOPBNY8S0jrOOYPrSr30xDbMfSXQ3oq00ieg9rgZUiw==}
+
+  '@stepperize/react@5.1.0':
+    resolution: {integrity: sha512-5FqMd38klnd8OlXqIKZ7/2uRfZJE+UDVLR3fSOvkBZvSIz/G823eW6Bg5nEDXOq1yYOB4QBU9zwPpAvmlKuorw==}
+    peerDependencies:
+      react: ^17.0.0 || ^18.0.0 || ^19.0.0
 
   '@swc/counter@0.1.3':
     resolution: {integrity: sha512-e2BR4lsJkkRlKZ/qCHPw9ZaSxc0MVUd7gtbtaB7aMvHeJVYe8sOB8DBZkP2DtISHGSku9sCK6T6cnY0CtXrOCQ==}
@@ -2030,6 +2041,13 @@ snapshots:
   '@rtsao/scc@1.1.0': {}
 
   '@rushstack/eslint-patch@1.10.5': {}
+
+  '@stepperize/core@1.2.0': {}
+
+  '@stepperize/react@5.1.0(react@19.0.0)':
+    dependencies:
+      '@stepperize/core': 1.2.0
+      react: 19.0.0
 
   '@swc/counter@0.1.3': {}
 
