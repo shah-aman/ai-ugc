@@ -84,6 +84,7 @@ export function ProductContextProvider({
     () => decodeURIComponent(params.productUrl),
     [params],
   );
+
   const contextValue = {
     product: {
       url: productUrl,
