@@ -21,6 +21,7 @@ import {
     TabsTrigger,
 } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface MarketingMetric {
     label: string;
@@ -96,9 +97,18 @@ export function MarketStrategyView() {
     const [activeAudience, setActiveAudience] = useState(marketingStrategy.targetAudiences[0]);
 
     return (
-        <div className="space-y-6">
-            {/* Header Section - updated padding */}
-            <div className="flex justify-between items-center">
+        <motion.div
+            className="w-full max-w-7xl mx-auto space-y-8 p-6"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3 }}
+        >
+            <motion.div
+                className="flex justify-between items-center"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.2 }}
+            >
                 <div className="space-y-1">
                     <h1 className="text-2xl font-medium">Product Marketing Strategy</h1>
                     <p className="text-muted-foreground">Comprehensive market analysis and planning</p>
@@ -107,151 +117,166 @@ export function MarketStrategyView() {
                     <Calendar className="mr-2 h-4 w-4" />
                     Go to Company Profile
                 </Button>
-            </div>
+            </motion.div>
 
             {/* KPI Overview Cards */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                {marketingStrategy.metrics.map((metric) => (
-                    <Card key={metric.label}>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">{metric.label}</CardTitle>
-                            {metric.trend && (
-                                <span className={`flex items-center text-sm ${metric.status === 'positive' ? 'text-green-500' :
-                                    metric.status === 'negative' ? 'text-red-500' :
-                                        'text-gray-500'
-                                    }`}>
-                                    {metric.trend > 0 && '+'}{metric.trend}%
-                                    <ArrowUpRight className="h-4 w-4 ml-1" />
-                                </span>
-                            )}
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold">{metric.value}</div>
-                        </CardContent>
-                    </Card>
-                ))}
+                <AnimatePresence>
+                    {marketingStrategy.metrics.map((metric, index) => (
+                        <motion.div
+                            key={metric.label}
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.2, delay: index * 0.1 }}
+                        >
+                            <Card>
+                                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                    <CardTitle className="text-sm font-medium">{metric.label}</CardTitle>
+                                    {metric.trend && (
+                                        <span className={`flex items-center text-sm ${metric.status === 'positive' ? 'text-green-500' :
+                                            metric.status === 'negative' ? 'text-red-500' :
+                                                'text-gray-500'
+                                            }`}>
+                                            {metric.trend > 0 && '+'}{metric.trend}%
+                                            <ArrowUpRight className="h-4 w-4 ml-1" />
+                                        </span>
+                                    )}
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="text-2xl font-bold">{metric.value}</div>
+                                </CardContent>
+                            </Card>
+                        </motion.div>
+                    ))}
+                </AnimatePresence>
             </div>
 
             {/* Main Content Tabs */}
-            <Tabs defaultValue="overview" className="space-y-4">
-                <TabsList>
-                    <TabsTrigger value="overview">Overview</TabsTrigger>
-                    <TabsTrigger value="audience">Target Audience</TabsTrigger>
-                    <TabsTrigger value="competitors">Competitor Analysis</TabsTrigger>
-                    <TabsTrigger value="performance">Performance</TabsTrigger>
-                </TabsList>
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.2, delay: 0.3 }}
+            >
+                <Tabs defaultValue="overview" className="space-y-4">
+                    <TabsList>
+                        <TabsTrigger value="overview">Overview</TabsTrigger>
+                        <TabsTrigger value="audience">Target Audience</TabsTrigger>
+                        <TabsTrigger value="competitors">Competitor Analysis</TabsTrigger>
+                        <TabsTrigger value="performance">Performance</TabsTrigger>
+                    </TabsList>
 
-                <TabsContent value="overview">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <Card>
-                            <CardHeader>
-                                <CardTitle>Strategy Summary</CardTitle>
-                                <CardDescription>Current marketing approach and goals</CardDescription>
-                            </CardHeader>
-                            <CardContent>
-                                <p className="text-sm text-muted-foreground">{marketingStrategy.summary}</p>
-                                <div className="mt-4 space-y-2">
-                                    {marketingStrategy.keyPoints.map((point, index) => (
-                                        <div key={index} className="flex items-start space-x-2">
-                                            <ChevronRight className="h-4 w-4 mt-1 text-primary" />
-                                            <span className="text-sm">{point}</span>
-                                        </div>
-                                    ))}
-                                </div>
-                            </CardContent>
-                        </Card>
-
-                        <Card>
-                            <CardHeader>
-                                <CardTitle>Key Performance Indicators</CardTitle>
-                                <CardDescription>Progress towards strategic goals</CardDescription>
-                            </CardHeader>
-                            <CardContent>
-                                <div className="space-y-4">
-                                    {marketingStrategy.kpis.map((kpi) => (
-                                        <div key={kpi.label} className="space-y-2">
-                                            <div className="flex justify-between text-sm">
-                                                <span className="font-medium">{kpi.label}</span>
-                                                <span className="text-muted-foreground">
-                                                    {kpi.current} / {kpi.target}
-                                                </span>
+                    <TabsContent value="overview">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle>Strategy Summary</CardTitle>
+                                    <CardDescription>Current marketing approach and goals</CardDescription>
+                                </CardHeader>
+                                <CardContent>
+                                    <p className="text-sm text-muted-foreground">{marketingStrategy.summary}</p>
+                                    <div className="mt-4 space-y-2">
+                                        {marketingStrategy.keyPoints.map((point, index) => (
+                                            <div key={index} className="flex items-start space-x-2">
+                                                <ChevronRight className="h-4 w-4 mt-1 text-primary" />
+                                                <span className="text-sm">{point}</span>
                                             </div>
-                                            <Progress value={kpi.progress} />
-                                        </div>
-                                    ))}
-                                </div>
-                            </CardContent>
-                        </Card>
-                    </div>
-                </TabsContent>
+                                        ))}
+                                    </div>
+                                </CardContent>
+                            </Card>
 
-                <TabsContent value="audience">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <Card className="md:col-span-1">
-                            <CardHeader>
-                                <CardTitle>Audience Segments</CardTitle>
-                                <CardDescription>Click to view detailed analysis</CardDescription>
-                            </CardHeader>
-                            <CardContent>
-                                <div className="space-y-2">
-                                    {marketingStrategy.targetAudiences.map((audience) => (
-                                        <div
-                                            key={audience.name}
-                                            onClick={() => setActiveAudience(audience)}
-                                            className={`p-3 rounded-lg cursor-pointer transition-colors
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle>Key Performance Indicators</CardTitle>
+                                    <CardDescription>Progress towards strategic goals</CardDescription>
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="space-y-4">
+                                        {marketingStrategy.kpis.map((kpi) => (
+                                            <div key={kpi.label} className="space-y-2">
+                                                <div className="flex justify-between text-sm">
+                                                    <span className="font-medium">{kpi.label}</span>
+                                                    <span className="text-muted-foreground">
+                                                        {kpi.current} / {kpi.target}
+                                                    </span>
+                                                </div>
+                                                <Progress value={kpi.progress} />
+                                            </div>
+                                        ))}
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        </div>
+                    </TabsContent>
+
+                    <TabsContent value="audience">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <Card className="md:col-span-1">
+                                <CardHeader>
+                                    <CardTitle>Audience Segments</CardTitle>
+                                    <CardDescription>Click to view detailed analysis</CardDescription>
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="space-y-2">
+                                        {marketingStrategy.targetAudiences.map((audience) => (
+                                            <div
+                                                key={audience.name}
+                                                onClick={() => setActiveAudience(audience)}
+                                                className={`p-3 rounded-lg cursor-pointer transition-colors
                         ${activeAudience.name === audience.name
-                                                    ? 'bg-primary/10'
-                                                    : 'hover:bg-secondary'}`}
-                                        >
-                                            <div className="flex justify-between items-center">
-                                                <span className="font-medium">{audience.name}</span>
-                                                <span className="text-sm text-muted-foreground">
-                                                    {audience.percentage}%
-                                                </span>
+                                                        ? 'bg-primary/10'
+                                                        : 'hover:bg-secondary'}`}
+                                            >
+                                                <div className="flex justify-between items-center">
+                                                    <span className="font-medium">{audience.name}</span>
+                                                    <span className="text-sm text-muted-foreground">
+                                                        {audience.percentage}%
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </CardContent>
+                            </Card>
+
+                            <Card className="md:col-span-2">
+                                <CardHeader>
+                                    <CardTitle>{activeAudience.name}</CardTitle>
+                                    <CardDescription>{activeAudience.description}</CardDescription>
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="grid grid-cols-2 gap-6">
+                                        <div>
+                                            <h4 className="text-sm font-medium mb-2">Key Preferences</h4>
+                                            <div className="space-y-2">
+                                                {activeAudience.preferences.map((pref, index) => (
+                                                    <div key={index} className="flex items-center space-x-2">
+                                                        <Target className="h-4 w-4 text-primary" />
+                                                        <span className="text-sm">{pref}</span>
+                                                    </div>
+                                                ))}
                                             </div>
                                         </div>
-                                    ))}
-                                </div>
-                            </CardContent>
-                        </Card>
-
-                        <Card className="md:col-span-2">
-                            <CardHeader>
-                                <CardTitle>{activeAudience.name}</CardTitle>
-                                <CardDescription>{activeAudience.description}</CardDescription>
-                            </CardHeader>
-                            <CardContent>
-                                <div className="grid grid-cols-2 gap-6">
-                                    <div>
-                                        <h4 className="text-sm font-medium mb-2">Key Preferences</h4>
-                                        <div className="space-y-2">
-                                            {activeAudience.preferences.map((pref, index) => (
-                                                <div key={index} className="flex items-center space-x-2">
-                                                    <Target className="h-4 w-4 text-primary" />
-                                                    <span className="text-sm">{pref}</span>
-                                                </div>
-                                            ))}
+                                        <div>
+                                            <h4 className="text-sm font-medium mb-2">Pain Points</h4>
+                                            <div className="space-y-2">
+                                                {activeAudience.painPoints.map((point, index) => (
+                                                    <div key={index} className="flex items-center space-x-2">
+                                                        <PieChart className="h-4 w-4 text-destructive" />
+                                                        <span className="text-sm">{point}</span>
+                                                    </div>
+                                                ))}
+                                            </div>
                                         </div>
                                     </div>
-                                    <div>
-                                        <h4 className="text-sm font-medium mb-2">Pain Points</h4>
-                                        <div className="space-y-2">
-                                            {activeAudience.painPoints.map((point, index) => (
-                                                <div key={index} className="flex items-center space-x-2">
-                                                    <PieChart className="h-4 w-4 text-destructive" />
-                                                    <span className="text-sm">{point}</span>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                </div>
-                            </CardContent>
-                        </Card>
-                    </div>
-                </TabsContent>
+                                </CardContent>
+                            </Card>
+                        </div>
+                    </TabsContent>
 
-                {/* Add Competitor Analysis and Performance tabs content */}
-            </Tabs>
-        </div>
+                    {/* Add Competitor Analysis and Performance tabs content */}
+                </Tabs>
+            </motion.div>
+        </motion.div>
     );
 } 

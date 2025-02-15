@@ -99,7 +99,7 @@ const influencers: Influencer[] = [
     {
         id: '2',
         name: "LifestyleGuru",
-        avatar: "https://ui-avatars.com/api/?name=Lifestyle+Guru&background=f43f5e&color=fff", 
+        avatar: "https://ui-avatars.com/api/?name=Lifestyle+Guru&background=f43f5e&color=fff",
         followers: "1.2M",
         engagement: "3.8%",
         socialMedia: {
@@ -187,7 +187,12 @@ export function InfluencersView() {
     const [searchQuery, setSearchQuery] = useState('');
 
     return (
-        <div className="w-full max-w-7xl mx-auto space-y-8 p-6">
+        <motion.div
+            className="w-full max-w-7xl mx-auto space-y-8 p-6"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3 }}
+        >
             {/* Header Section */}
             <div className="space-y-6 max-w-2xl mx-auto text-center">
                 <div className="space-y-2">
@@ -365,6 +370,6 @@ export function InfluencersView() {
                     <p className="text-muted-foreground">No influencers found matching your search.</p>
                 </div>
             )}
-        </div>
+        </motion.div>
     );
 } 

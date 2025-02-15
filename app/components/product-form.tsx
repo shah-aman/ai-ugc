@@ -1,13 +1,13 @@
 "use client";
 
-import { PlaceholdersAndVanishInput } from "@/components/ui/placeholders-and-vanish-input";
 import { useRouter } from "next/navigation";
+import { PlaceholdersAndVanishInput } from "@/components/ui/placeholders-and-vanish-input";
 import { motion } from "framer-motion";
 
-const PLACEHOLDER_LINKS = [
-  "https://a.co/d/fwhl29U",
-  "https://www.etsy.com/listing/624694625",
-];
+// const PLACEHOLDER_LINKS = [
+//   "https://a.co/d/fwhl29U",
+//   "https://www.etsy.com/listing/624694625",
+// ];
 
 const PLATFORMS = [
   {
@@ -24,12 +24,25 @@ const PLATFORMS = [
   },
 ];
 
+const placeholders = [
+  "Enter a product URL from Amazon, eBay, or any e-commerce site...",
+  "Paste a link to your product to get started...",
+  "Share your product URL to begin the analysis...",
+];
+
 export function ProductForm() {
   const router = useRouter();
 
-  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // todo: Add input validation/processing here
+  };
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const productUrl = (e.target as HTMLFormElement).productUrl.value;
+    const input = e.currentTarget.querySelector('input');
+    if (!input?.value) return;
+
+    const productUrl = input.value;
     router.push(`/${encodeURIComponent(productUrl)}/product`);
   };
 
@@ -51,9 +64,9 @@ export function ProductForm() {
         transition={{ delay: 0.3 }}
       >
         <PlaceholdersAndVanishInput
-          placeholders={PLACEHOLDER_LINKS}
-          onChange={() => { }}
-          onSubmit={onSubmit}
+          placeholders={placeholders}
+          onChange={handleChange}
+          onSubmit={handleSubmit}
         />
       </motion.div>
 
