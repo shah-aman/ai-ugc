@@ -1,16 +1,11 @@
-import { useState } from 'react';
 import {
+    Users,
     Target,
-    Calendar,
-    ArrowUpRight,
-    ChevronRight,
-    PieChart
+    Crosshair,
 } from 'lucide-react';
-import { Button } from "@/components/ui/button";
 import {
     Card,
     CardContent,
-    CardDescription,
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
@@ -20,263 +15,394 @@ import {
     TabsList,
     TabsTrigger,
 } from "@/components/ui/tabs";
-import { Progress } from "@/components/ui/progress";
-import { motion, AnimatePresence } from "framer-motion";
+import { Badge } from "@/components/ui/badge";
+import { ConsolidatedResearch } from "@/app/api/research/product/types";
+import { useState } from 'react';
 
-interface MarketingMetric {
-    label: string;
-    value: string;
-    trend?: number;
-    status?: 'positive' | 'negative' | 'neutral';
+interface MarketStrategyViewProps {
+    researchData: ConsolidatedResearch;
 }
 
-interface TargetAudience {
+interface SourceIconProps {
+    domain: string;
     name: string;
-    percentage: number;
-    description: string;
-    preferences: string[];
-    painPoints: string[];
 }
 
-interface CompetitorAnalysis {
-    name: string;
-    marketShare: string;
-    strengths: string[];
-    weaknesses: string[];
-    pricePoint: string;
-}
+function SourceIcon({ domain, name }: SourceIconProps) {
+    const [useFallback, setUseFallback] = useState(false);
 
-const marketingStrategy = {
-    summary: "Our strategy focuses on leveraging micro and macro influencers across various social media platforms to increase brand awareness and drive sales for our Premium Wireless Headphones. We'll target influencers in the tech, music, and lifestyle niches to reach a diverse audience and showcase the product's versatility.",
-    keyPoints: [
-        "Collaborate with 20+ influencers across Instagram, YouTube, and TikTok",
-        "Create unique discount codes for each influencer to track conversions",
-        "Encourage authentic product reviews and demonstrations",
-        "Run a branded hashtag campaign to increase user-generated content",
-        "Host influencer-led giveaways to boost engagement and followers",
-    ],
-    metrics: [
-        { label: "Estimated Reach", value: "2.5M+", trend: 15, status: 'positive' },
-        { label: "Target ROI", value: "350%", trend: 5, status: 'positive' },
-        { label: "Campaign Duration", value: "3 months", status: 'neutral' },
-        { label: "Budget Range", value: "$15K-25K", trend: -2, status: 'negative' },
-    ] as MarketingMetric[],
-    targetAudiences: [
-        {
-            name: "Tech Enthusiasts",
-            percentage: 45,
-            description: "Early adopters who prioritize sound quality and features",
-            preferences: ["High-fidelity audio", "Latest technology", "Premium build quality"],
-            painPoints: ["Battery life", "Connectivity issues", "Price sensitivity"]
-        },
-        {
-            name: "Music Professionals",
-            percentage: 30,
-            description: "Musicians and audio professionals seeking reliable equipment",
-            preferences: ["Studio-quality sound", "Durability", "Professional appearance"],
-            painPoints: ["Latency", "Noise isolation", "Wireless reliability"]
-        }
-    ] as TargetAudience[],
-    competitors: [
-        {
-            name: "SoundMaster Pro",
-            marketShare: "35%",
-            strengths: ["Brand recognition", "Wide distribution", "Marketing budget"],
-            weaknesses: ["Higher price point", "Limited features", "Older technology"],
-            pricePoint: "$299"
-        }
-    ] as CompetitorAnalysis[],
-    kpis: [
-        { label: "Market Share", current: "15%", target: "25%", progress: 60 },
-        { label: "Brand Awareness", current: "45%", target: "70%", progress: 64 },
-        { label: "Customer Satisfaction", current: "4.2/5", target: "4.5/5", progress: 84 }
-    ]
-};
-
-export function MarketStrategyView() {
-    const [activeAudience, setActiveAudience] = useState(marketingStrategy.targetAudiences[0]);
+    if (useFallback) {
+        return (
+            <img
+                src="/placeholder-favicon.png"
+                alt={`${name} Icon`}
+                className="rounded-full w-4 h-4"
+            />
+        );
+    }
 
     return (
-        <motion.div
-            className="w-full max-w-7xl mx-auto space-y-8 p-6"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.3 }}
-        >
-            <motion.div
-                className="flex justify-between items-center"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.2 }}
-            >
-                <div className="space-y-1">
-                    <h1 className="text-2xl font-medium">Product Marketing Strategy</h1>
-                    <p className="text-muted-foreground">Comprehensive market analysis and planning</p>
-                </div>
-                <Button size="sm" variant="secondary">
-                    <Calendar className="mr-2 h-4 w-4" />
-                    Go to Company Profile
-                </Button>
-            </motion.div>
+        <img
+            src={`https://${domain}/favicon.ico`}
+            alt={`${name} Icon`}
+            className="rounded-full w-4 h-4"
+            onError={() => setUseFallback(true)}
+        />
+    );
+}
 
-            {/* KPI Overview Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <AnimatePresence>
-                    {marketingStrategy.metrics.map((metric, index) => (
-                        <motion.div
-                            key={metric.label}
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.2, delay: index * 0.1 }}
-                        >
-                            <Card>
-                                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                    <CardTitle className="text-sm font-medium">{metric.label}</CardTitle>
-                                    {metric.trend && (
-                                        <span className={`flex items-center text-sm ${metric.status === 'positive' ? 'text-green-500' :
-                                            metric.status === 'negative' ? 'text-red-500' :
-                                                'text-gray-500'
-                                            }`}>
-                                            {metric.trend > 0 && '+'}{metric.trend}%
-                                            <ArrowUpRight className="h-4 w-4 ml-1" />
-                                        </span>
-                                    )}
-                                </CardHeader>
-                                <CardContent>
-                                    <div className="text-2xl font-bold">{metric.value}</div>
-                                </CardContent>
-                            </Card>
-                        </motion.div>
-                    ))}
-                </AnimatePresence>
+export function MarketStrategyView({ researchData }: MarketStrategyViewProps) {
+    return (
+        <div className="space-y-6">
+            {/* Overview Cards */}
+            <div className="space-y-3">
+                <div className="grid grid-cols-3 gap-2">
+                    <Card className="bg-background/50 border-sidebar-border">
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 p-2">
+                            <CardTitle className="text-[11px] font-medium text-muted-foreground">Market Size</CardTitle>
+                            <Users className="h-3 w-3 text-muted-foreground" />
+                        </CardHeader>
+                        <CardContent className="pt-0 pb-2 px-2">
+                            <div className="text-base font-medium">
+                                {researchData.summary.detailedAnalysis.market.primaryMarket.marketSize}
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    <Card className="bg-background/50 border-sidebar-border">
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 p-2">
+                            <CardTitle className="text-[11px] font-medium text-muted-foreground">Target Segments</CardTitle>
+                            <Target className="h-3 w-3 text-muted-foreground" />
+                        </CardHeader>
+                        <CardContent className="pt-0 pb-2 px-2">
+                            <div className="text-base font-medium">
+                                {researchData.summary.detailedAnalysis.market.userPersonas.length}
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    <Card className="bg-background/50 border-sidebar-border">
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 p-2">
+                            <CardTitle className="text-[11px] font-medium text-muted-foreground">Competitors</CardTitle>
+                            <Crosshair className="h-3 w-3 text-muted-foreground" />
+                        </CardHeader>
+                        <CardContent className="pt-0 pb-2 px-2">
+                            <div className="text-base font-medium">
+                                {researchData.summary.detailedAnalysis.competition.directCompetitors.length}
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
+
+                {/* Satisfaction Metrics */}
+                <div className="grid grid-cols-5 gap-2">
+                    <div className="p-2 bg-muted/50 rounded-lg border flex flex-col">
+                        <div className="flex items-center justify-between">
+                            <span className="text-[11px] font-medium text-muted-foreground">Overall Rating</span>
+                            <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500">
+                                {researchData.summary.detailedAnalysis.painPoints.satisfactionMetrics.overallRating}
+                            </span>
+                        </div>
+                    </div>
+
+                    {Object.entries(researchData.summary.detailedAnalysis.painPoints.satisfactionMetrics.keyMetrics).map(([key, value], index) => {
+                        const colors = {
+                            0: { bg: 'bg-blue-500', text: 'text-blue-500', light: 'bg-blue-500/10' },
+                            1: { bg: 'bg-violet-500', text: 'text-violet-500', light: 'bg-violet-500/10' },
+                            2: { bg: 'bg-orange-500', text: 'text-orange-500', light: 'bg-orange-500/10' },
+                        };
+                        const color = colors[index as keyof typeof colors] || colors[0];
+
+                        return (
+                            <div key={key} className="p-2 bg-muted/50 rounded-lg border flex flex-col">
+                                <div className="flex items-center justify-between">
+                                    <span className="text-[11px] font-medium text-muted-foreground">
+                                        {key.split(/(?=[A-Z])/).join(' ')}
+                                    </span>
+                                    <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${color.light} ${color.text}`}>
+                                        {value}
+                                    </span>
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
             </div>
 
-            {/* Main Content Tabs */}
-            <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.2, delay: 0.3 }}
-            >
-                <Tabs defaultValue="overview" className="space-y-4">
-                    <TabsList>
-                        <TabsTrigger value="overview">Overview</TabsTrigger>
-                        <TabsTrigger value="audience">Target Audience</TabsTrigger>
-                        <TabsTrigger value="competitors">Competitor Analysis</TabsTrigger>
-                        <TabsTrigger value="performance">Performance</TabsTrigger>
-                    </TabsList>
+            <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                    <h3 className="text-sm font-medium">Research Sources</h3>
+                    <span className="text-xs text-muted-foreground">
+                        {researchData.citations.length} sources
+                    </span>
+                </div>
 
-                    <TabsContent value="overview">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle>Strategy Summary</CardTitle>
-                                    <CardDescription>Current marketing approach and goals</CardDescription>
-                                </CardHeader>
-                                <CardContent>
-                                    <p className="text-sm text-muted-foreground">{marketingStrategy.summary}</p>
-                                    <div className="mt-4 space-y-2">
-                                        {marketingStrategy.keyPoints.map((point, index) => (
-                                            <div key={index} className="flex items-start space-x-2">
-                                                <ChevronRight className="h-4 w-4 mt-1 text-primary" />
-                                                <span className="text-sm">{point}</span>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </CardContent>
-                            </Card>
+                <div className="flex flex-wrap gap-2">
+                    {researchData.citations.map((citation, i) => {
+                        const urlMatch = citation.match(/https?:\/\/([^\/]+)/);
+                        const domain = urlMatch ? urlMatch[1] : '';
+                        const nameMatch = citation.match(/^(.*?)\s*-\s*http/);
+                        const name = nameMatch ? nameMatch[1] : domain;
 
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle>Key Performance Indicators</CardTitle>
-                                    <CardDescription>Progress towards strategic goals</CardDescription>
-                                </CardHeader>
-                                <CardContent>
-                                    <div className="space-y-4">
-                                        {marketingStrategy.kpis.map((kpi) => (
-                                            <div key={kpi.label} className="space-y-2">
-                                                <div className="flex justify-between text-sm">
-                                                    <span className="font-medium">{kpi.label}</span>
-                                                    <span className="text-muted-foreground">
-                                                        {kpi.current} / {kpi.target}
-                                                    </span>
-                                                </div>
-                                                <Progress value={kpi.progress} />
-                                            </div>
-                                        ))}
-                                    </div>
-                                </CardContent>
-                            </Card>
+                        return (
+                            <div
+                                key={i}
+                                className="flex items-center gap-2 shrink-0 border bg-muted/50 px-3 py-1.5 rounded-sm hover:bg-muted/70 transition-colors"
+                            >
+                                <div className="relative h-4 w-4 flex-none">
+                                    <SourceIcon domain={domain} name={name} />
+                                </div>
+                                <span className="text-xs text-muted-foreground whitespace-nowrap">
+                                    {name}
+                                </span>
+                            </div>
+                        );
+                    })}
+                </div>
+
+                <div className="text-xs text-muted-foreground mt-4 pt-4 border-t">
+                    <p>All sources have been analyzed and verified for relevance and accuracy.</p>
+                </div>
+            </div>
+
+            {/* Main Content */}
+            <Tabs defaultValue="market" className="w-full">
+                <TabsList className="w-full justify-start h-auto gap-2 bg-transparent pb-4">
+                    <TabsTrigger value="market" className="data-[state=active]:bg-primary/10 px-3 py-1.5 text-xs">
+                        Market Analysis
+                    </TabsTrigger>
+                    <TabsTrigger value="audience" className="data-[state=active]:bg-primary/10 px-3 py-1.5 text-xs">
+                        Target Audience
+                    </TabsTrigger>
+                    <TabsTrigger value="competition" className="data-[state=active]:bg-primary/10 px-3 py-1.5 text-xs">
+                        Competition
+                    </TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="market" className="mt-0 px-1 space-y-4">
+                    <div className="space-y-4">
+                        {/* Market Overview */}
+                        <div className="space-y-2">
+                            <p className="text-sm text-muted-foreground">
+                                {researchData.summary.productSummary.overview}
+                            </p>
+                            <div className="mt-4">
+                                <h4 className="text-xs font-medium mb-2">Key Insights</h4>
+                                <div className="space-y-2">
+                                    {researchData.summary.productSummary.keyInsights.map((insight, index) => (
+                                        <p key={index} className="text-sm text-muted-foreground">
+                                            • {insight}
+                                        </p>
+                                    ))}
+                                </div>
+                            </div>
                         </div>
-                    </TabsContent>
 
-                    <TabsContent value="audience">
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <Card className="md:col-span-1">
-                                <CardHeader>
-                                    <CardTitle>Audience Segments</CardTitle>
-                                    <CardDescription>Click to view detailed analysis</CardDescription>
-                                </CardHeader>
-                                <CardContent>
-                                    <div className="space-y-2">
-                                        {marketingStrategy.targetAudiences.map((audience) => (
-                                            <div
-                                                key={audience.name}
-                                                onClick={() => setActiveAudience(audience)}
-                                                className={`p-3 rounded-lg cursor-pointer transition-colors
-                        ${activeAudience.name === audience.name
-                                                        ? 'bg-primary/10'
-                                                        : 'hover:bg-secondary'}`}
-                                            >
-                                                <div className="flex justify-between items-center">
-                                                    <span className="font-medium">{audience.name}</span>
-                                                    <span className="text-sm text-muted-foreground">
-                                                        {audience.percentage}%
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        ))}
+                        {/* Secondary Markets */}
+                        <div className="space-y-3">
+                            <h3 className="text-sm font-medium">Secondary Markets</h3>
+                            <div className="grid gap-2">
+                                {researchData.summary.detailedAnalysis.market.secondaryMarkets.map((market, index) => (
+                                    <div key={index} className="p-3 bg-muted/50 rounded-lg border">
+                                        <h4 className="text-sm font-medium mb-1">{market.segment}</h4>
+                                        <p className="text-sm text-muted-foreground">{market.opportunity}</p>
                                     </div>
-                                </CardContent>
-                            </Card>
+                                ))}
+                            </div>
+                        </div>
 
-                            <Card className="md:col-span-2">
-                                <CardHeader>
-                                    <CardTitle>{activeAudience.name}</CardTitle>
-                                    <CardDescription>{activeAudience.description}</CardDescription>
-                                </CardHeader>
-                                <CardContent>
-                                    <div className="grid grid-cols-2 gap-6">
-                                        <div>
-                                            <h4 className="text-sm font-medium mb-2">Key Preferences</h4>
-                                            <div className="space-y-2">
-                                                {activeAudience.preferences.map((pref, index) => (
-                                                    <div key={index} className="flex items-center space-x-2">
-                                                        <Target className="h-4 w-4 text-primary" />
-                                                        <span className="text-sm">{pref}</span>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <h4 className="text-sm font-medium mb-2">Pain Points</h4>
-                                            <div className="space-y-2">
-                                                {activeAudience.painPoints.map((point, index) => (
-                                                    <div key={index} className="flex items-center space-x-2">
-                                                        <PieChart className="h-4 w-4 text-destructive" />
-                                                        <span className="text-sm">{point}</span>
-                                                    </div>
-                                                ))}
-                                            </div>
+                        {/* Use Cases */}
+                        <div className="space-y-3">
+                            <h3 className="text-sm font-medium">Use Cases</h3>
+                            <div className="grid gap-2">
+                                {researchData.summary.detailedAnalysis.market.useCases.map((useCase, index) => (
+                                    <div key={index} className="p-3 bg-muted/50 rounded-lg border">
+                                        <h4 className="text-sm font-medium mb-2">{useCase.scenario}</h4>
+                                        <div className="space-y-1">
+                                            {useCase.benefits.map((benefit, i) => (
+                                                <p key={i} className="text-sm text-muted-foreground">
+                                                    • {benefit}
+                                                </p>
+                                            ))}
                                         </div>
                                     </div>
-                                </CardContent>
-                            </Card>
+                                ))}
+                            </div>
                         </div>
-                    </TabsContent>
+                    </div>
+                </TabsContent>
 
-                    {/* Add Competitor Analysis and Performance tabs content */}
-                </Tabs>
-            </motion.div>
-        </motion.div>
+                <TabsContent value="audience" className="mt-0 px-1 space-y-3">
+                    {/* Primary Market */}
+                    <div className="p-3 bg-muted/50 rounded-lg border space-y-2.5">
+                        <div className="flex items-center justify-between">
+                            <h3 className="text-xs font-medium">Primary Market</h3>
+                            <Badge variant="outline" className="text-[10px]">
+                                {researchData.summary.detailedAnalysis.market.primaryMarket.marketSize}
+                            </Badge>
+                        </div>
+                        <div className="space-y-2">
+                            <div className="flex flex-wrap gap-1.5">
+                                {researchData.summary.detailedAnalysis.market.primaryMarket.demographics.map((demo, i) => (
+                                    <Badge key={i} variant="secondary" className="text-[10px]">
+                                        {demo}
+                                    </Badge>
+                                ))}
+                            </div>
+                            <div className="flex flex-wrap gap-1.5">
+                                {researchData.summary.detailedAnalysis.market.primaryMarket.psychographics.map((psycho, i) => (
+                                    <Badge key={i} variant="outline" className="text-[10px]">
+                                        {psycho}
+                                    </Badge>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Secondary Markets */}
+                    <div className="space-y-2">
+                        {researchData.summary.detailedAnalysis.market.secondaryMarkets.map((market, index) => (
+                            <div key={index} className="p-3 bg-muted/50 rounded-lg border space-y-2.5">
+                                <div className="flex items-center justify-between">
+                                    <h3 className="text-xs font-medium">{market.segment}</h3>
+                                    <Badge variant="outline" className="text-[10px]">
+                                        Secondary Market
+                                    </Badge>
+                                </div>
+                                <p className="text-xs text-muted-foreground">{market.opportunity}</p>
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* User Personas */}
+                    <div className="grid gap-2">
+                        {researchData.summary.detailedAnalysis.market.userPersonas.map((persona, index) => (
+                            <div key={index} className="p-3 bg-muted/50 rounded-lg border space-y-2">
+                                <div className="flex items-center justify-between">
+                                    <h3 className="text-xs font-medium">{persona.type}</h3>
+                                    <Badge variant="outline" className="text-[10px]">
+                                        Persona
+                                    </Badge>
+                                </div>
+                                <p className="text-xs text-muted-foreground">{persona.description}</p>
+                                <div className="flex flex-wrap gap-1.5">
+                                    {persona.needs.map((need, i) => (
+                                        <Badge key={i} variant="secondary" className="text-[10px]">
+                                            {need}
+                                        </Badge>
+                                    ))}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </TabsContent>
+
+                <TabsContent value="competition" className="mt-0 px-1 space-y-3">
+                    {/* Market Position Overview */}
+                    <div className="p-3 bg-muted/50 rounded-lg border">
+                        <div className="grid grid-cols-3 gap-3">
+                            <div>
+                                <h4 className="text-[11px] font-medium text-muted-foreground mb-2">Advantages</h4>
+                                <div className="flex flex-col gap-1.5">
+                                    {researchData.summary.detailedAnalysis.competition.marketPosition.uniqueAdvantages.map((advantage, i) => (
+                                        <span key={i} className="text-xs text-muted-foreground">
+                                            • {advantage}
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
+                            <div>
+                                <h4 className="text-[11px] font-medium text-muted-foreground mb-2">Challenges</h4>
+                                <div className="flex flex-col gap-1.5">
+                                    {researchData.summary.detailedAnalysis.competition.marketPosition.challenges.map((challenge, i) => (
+                                        <span key={i} className="text-xs text-muted-foreground">
+                                            • {challenge}
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
+                            <div>
+                                <h4 className="text-[11px] font-medium text-muted-foreground mb-2">Opportunities</h4>
+                                <div className="flex flex-col gap-1.5">
+                                    {researchData.summary.detailedAnalysis.competition.marketPosition.opportunities.map((opportunity, i) => (
+                                        <span key={i} className="text-xs text-muted-foreground">
+                                            • {opportunity}
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Direct Competitors */}
+                    <div className="space-y-2">
+                        {researchData.summary.detailedAnalysis.competition.directCompetitors.map((competitor, index) => (
+                            <div key={index} className="p-3 bg-muted/50 rounded-lg border space-y-3">
+                                <div className="flex items-center justify-between">
+                                    <div className="space-y-1">
+                                        <h3 className="text-xs font-medium">{competitor.name}</h3>
+                                        <Badge variant="outline" className="text-[10px]">
+                                            {competitor.pricePoint}
+                                        </Badge>
+                                    </div>
+                                    <Badge variant="secondary" className="text-[10px]">
+                                        Direct Competitor
+                                    </Badge>
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <h4 className="text-[11px] font-medium text-muted-foreground mb-1.5">Strengths</h4>
+                                        <div className="flex flex-col gap-1">
+                                            {competitor.strengths.map((strength, i) => (
+                                                <span key={i} className="text-xs text-muted-foreground">
+                                                    • {strength}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h4 className="text-[11px] font-medium text-muted-foreground mb-1.5">Weaknesses</h4>
+                                        <div className="flex flex-col gap-1">
+                                            {competitor.weaknesses.map((weakness, i) => (
+                                                <span key={i} className="text-xs text-muted-foreground">
+                                                    • {weakness}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* Indirect Competitors */}
+                    <div className="space-y-2">
+                        {researchData.summary.detailedAnalysis.competition.indirectCompetitors.map((competitor, index) => (
+                            <div key={index} className="p-3 bg-muted/50 rounded-lg border space-y-2">
+                                <div className="flex items-center justify-between">
+                                    <h3 className="text-xs font-medium">{competitor.name}</h3>
+                                    <div className="flex items-center gap-2">
+                                        <Badge variant="outline" className="text-[10px]">
+                                            {competitor.threatLevel}
+                                        </Badge>
+                                        <Badge variant="secondary" className="text-[10px]">
+                                            Indirect
+                                        </Badge>
+                                    </div>
+                                </div>
+                                <div className="flex flex-wrap gap-1.5">
+                                    {competitor.differentiators.map((diff, i) => (
+                                        <Badge key={i} variant="outline" className="text-[10px]">
+                                            {diff}
+                                        </Badge>
+                                    ))}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </TabsContent>
+            </Tabs>
+        </div>
     );
 } 
