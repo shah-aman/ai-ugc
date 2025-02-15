@@ -48,14 +48,16 @@ export function FinalVideoView() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2">
-          <div className="bg-background/30 rounded-lg border border-sidebar-border overflow-hidden">
-            <VideoPlayer videoUrl="/placeholder.mp4" />
-          </div>
-        </div>
-        <div>
+      <div className="grid grid-cols-1 lg:grid-cols-6 gap-6">
+        <div className="lg:col-span-4 order-2 lg:order-1">
           <AdDetails details={adDetails} onShare={handleShare} />
+        </div>
+        <div className="lg:col-span-2 order-1 lg:order-2">
+          <div className="bg-background/30 rounded-lg border border-sidebar-border overflow-hidden">
+            <div style={{ aspectRatio: '9/16' }}>
+              <VideoPlayer videoUrl="/placeholder.mp4" />
+            </div>
+          </div>
         </div>
       </div>
     </div>

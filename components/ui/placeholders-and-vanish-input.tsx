@@ -45,7 +45,9 @@ export function PlaceholdersAndVanishInput({
 
   const handleVisibilityChange = useCallback(() => {
     if (document.visibilityState !== "visible") {
-      intervalRef.current && clearInterval(intervalRef.current);
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
       intervalRef.current = null;
     } else {
       startAnimation();
@@ -57,7 +59,9 @@ export function PlaceholdersAndVanishInput({
     document.addEventListener("visibilitychange", handleVisibilityChange);
 
     return () => {
-      intervalRef.current && clearInterval(intervalRef.current);
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
       document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
   }, [startAnimation, handleVisibilityChange]);

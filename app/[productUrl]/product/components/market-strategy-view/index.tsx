@@ -100,12 +100,12 @@ export function MarketStrategyView() {
             {/* Header Section - updated padding */}
             <div className="flex justify-between items-center">
                 <div className="space-y-1">
-                    <h1 className="text-2xl font-medium">Market Strategy</h1>
+                    <h1 className="text-2xl font-medium">Product Marketing Strategy</h1>
                     <p className="text-muted-foreground">Comprehensive market analysis and planning</p>
                 </div>
-                <Button>
+                <Button size="sm" variant="secondary">
                     <Calendar className="mr-2 h-4 w-4" />
-                    Update Strategy
+                    Go to Company Profile
                 </Button>
             </div>
 

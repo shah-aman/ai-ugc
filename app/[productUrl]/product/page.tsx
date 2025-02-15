@@ -6,7 +6,6 @@ import { ProductView } from "./components/product-view";
 import { FinalVideoView } from "./components/final-video-view";
 import { IntermediateVideoView } from "./components/intermediate-video-view";
 import { StoryboardView } from "./components/storyboard-view";
-import { StrategyView } from "./components/influencers";
 import { ProductContextProvider } from "./contexts/product-context";
 import { cn } from "@/lib/utils";
 import { Instrument_Serif } from 'next/font/google';
@@ -34,7 +33,7 @@ export default function StepperDemo() {
   return (
     <ProductContextProvider>
       <StepperProvider
-        className="space-y-6"
+        className="space-y-6 w-full"
         variant="horizontal"
         style={{
           "--step-circle-size": "1.0rem",
@@ -44,7 +43,7 @@ export default function StepperDemo() {
         {({ methods }) => (
           <div className="flex flex-col gap-6 p-6 w-full">
             <StepperNavigation
-              className="w-full flex items-center justify-between gap-1 bg-background/30 py-2 px-3 rounded-lg border border-sidebar-border shadow-sm"
+              className="w-full items-center justify-between gap-1 bg-background/30 py-2 px-3 rounded-lg border border-sidebar-border shadow-sm"
             >
               <div className="flex gap-2 min-w-0">
                 {methods.all.map((step) => (
@@ -70,7 +69,7 @@ export default function StepperDemo() {
                 ))}
               </div>
 
-              <div className="ml-auto flex gap-1 flex-shrink-0 border-l border-sidebar-border pl-2">
+              <div className="flex gap-1 flex-shrink-0 border-l border-sidebar-border pl-2">
                 {!methods.isFirst && (
                   <Button
                     variant="outline"

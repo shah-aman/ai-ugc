@@ -29,7 +29,7 @@ export function ProductForm() {
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const productUrl = e.target[0].value;
+    const productUrl = (e.target as HTMLFormElement).productUrl.value;
     router.push(`/${encodeURIComponent(productUrl)}/product`);
   };
 

@@ -55,7 +55,8 @@ export function IntermediateVideoPlayer() {
 
   return (
     <motion.div
-      className="relative aspect-video bg-background/30 rounded-lg border border-sidebar-border overflow-hidden"
+      className="relative bg-background/30 rounded-lg border border-sidebar-border overflow-hidden"
+      style={{ aspectRatio: '9/16' }}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}

@@ -21,7 +21,6 @@ import {
 } from "@/components/ui/sidebar"
 import { Separator } from "@/components/ui/separator"
 // import { useAuth } from "@/lib/auth-context"
-import _ from "lodash"
 import { Instrument_Serif } from 'next/font/google';
 import { usePathname } from 'next/navigation'
 
