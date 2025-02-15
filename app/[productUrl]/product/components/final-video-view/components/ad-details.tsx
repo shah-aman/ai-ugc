@@ -1,5 +1,7 @@
 import { motion } from "framer-motion";
-import { Share2 } from "lucide-react";
+import { Clock, Film, Share2, Video, FileVideo, MessageSquare } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 export type AdDetailsProps = {
   details: {
@@ -14,33 +16,80 @@ export type AdDetailsProps = {
 
 export function AdDetails({ details, onShare }: AdDetailsProps) {
   return (
-    <motion.div
-      className="bg-[#1c1c1f] p-6 rounded-lg shadow-lg"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: 0.2 }}
-    >
-      <h2 className="text-2xl font-bold mb-4">{details.title}</h2>
-      <div className="space-y-2 mb-4">
-        <p>
-          <span className="font-semibold">Duration:</span> {details.duration}
-        </p>
-        <p>
-          <span className="font-semibold">Resolution:</span>{" "}
-          {details.resolution}
-        </p>
-        <p>
-          <span className="font-semibold">Format:</span> {details.format}
-        </p>
-      </div>
-      <p className="text-gray-300 mb-6">{details.description}</p>
-      <button
-        onClick={onShare}
-        className="w-full h-12 bg-gradient-to-b from-[#7c5aff] to-[#6c47ff] rounded-[99px] shadow-[inset_0px_1px_0px_0px_rgba(255,255,255,0.16),0px_1px_2px_0px_rgba(0,0,0,0.20)] justify-center items-center inline-flex overflow-hidden cursor-pointer hover:from-[#8f71ff] hover:to-[#7c5aff] active:from-[#6c47ff] active:to-[#5835ff] transition-all duration-200"
+    <div className="space-y-6">
+      <motion.div
+        className="space-y-4 bg-background/30 rounded-lg border border-sidebar-border p-4"
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
       >
-        <Share2 className="w-5 h-5 mr-2" />
-        <span className="text-white text-[15px] font-medium">Share Video</span>
-      </button>
-    </motion.div>
+        {/* Video Metadata */}
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-1.5">
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <Clock className="w-4 h-4" />
+              <span className="text-xs font-medium">Duration</span>
+            </div>
+            <p className="text-sm">{details.duration}</p>
+          </div>
+          
+          <div className="space-y-1.5">
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <Video className="w-4 h-4" />
+              <span className="text-xs font-medium">Resolution</span>
+            </div>
+            <p className="text-sm">{details.resolution}</p>
+          </div>
+          
+          <div className="space-y-1.5">
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <FileVideo className="w-4 h-4" />
+              <span className="text-xs font-medium">Format</span>
+            </div>
+            <p className="text-sm">{details.format}</p>
+          </div>
+          
+          <div className="space-y-1.5">
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <Film className="w-4 h-4" />
+              <span className="text-xs font-medium">Framerate</span>
+            </div>
+            <p className="text-sm">60 FPS</p>
+          </div>
+        </div>
+
+        {/* Description */}
+        <div className="space-y-1.5">
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <MessageSquare className="w-4 h-4" />
+            <span className="text-xs font-medium">Description</span>
+          </div>
+          <p className="text-sm text-muted-foreground">{details.description}</p>
+        </div>
+      </motion.div>
+
+      {/* Action Buttons */}
+      <div className="flex flex-col gap-2">
+        <Button
+          onClick={onShare}
+          className={cn(
+            "w-full bg-fuchsia-500 text-white",
+            "hover:bg-fuchsia-600",
+            "focus-visible:ring-2 focus-visible:ring-sidebar-ring focus-visible:outline-none"
+          )}
+        >
+          <Share2 className="w-4 h-4 mr-2" />
+          Share Video
+        </Button>
+        
+        <Button
+          variant="outline"
+          className="w-full"
+        >
+          <FileVideo className="w-4 h-4 mr-2" />
+          Download
+        </Button>
+      </div>
+    </div>
   );
 }

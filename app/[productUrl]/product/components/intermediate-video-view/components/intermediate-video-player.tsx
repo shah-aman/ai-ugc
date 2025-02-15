@@ -1,153 +1,156 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
-
+import { useRef, useEffect } from "react";
 import { motion } from "framer-motion";
-import {
-  Play,
-  Pause,
-  RotateCcw,
-  Volume2,
-  VolumeX,
-  SkipBack,
-  SkipForward,
-} from "lucide-react";
+import { Play, Pause, Volume2, VolumeX, ChevronLeft, ChevronRight } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Slider } from "@/components/ui/slider";
+import { Badge } from "@/components/ui/badge";
+import { useProductContext } from "../../../contexts/product-context";
 
-interface Scene {
-  id: number;
-  title: string;
-  duration: string;
-  thumbnail: string;
-}
-
-interface IntermediateVideoPlayerProps {
-  scenes: Scene[];
-  currentScene: number;
-  onSceneChange: (sceneIndex: number) => void;
-}
-
-export function IntermediateVideoPlayer({
-  scenes,
-  currentScene,
-  onSceneChange,
-}: IntermediateVideoPlayerProps) {
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [isMuted, setIsMuted] = useState(false);
+export function IntermediateVideoPlayer() {
+  const { intermediateVideo, storyboard } = useProductContext();
+  const { videoState, setVideoState, handleSceneChange } = intermediateVideo;
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
     if (videoRef.current) {
-      videoRef.current.src = scenes[currentScene].thumbnail;
-      if (isPlaying) {
+      if (videoState.isPlaying) {
         videoRef.current.play();
-      }
-    }
-  }, [currentScene, scenes, isPlaying]); // Added isPlaying to dependencies
-
-  const togglePlay = () => {
-    if (videoRef.current) {
-      if (isPlaying) {
-        videoRef.current.pause();
       } else {
-        videoRef.current.play();
+        videoRef.current.pause();
       }
-      setIsPlaying(!isPlaying);
+    }
+  }, [videoState.isPlaying]);
+
+  const handleTimeUpdate = () => {
+    if (videoRef.current) {
+      const progress = (videoRef.current.currentTime / videoRef.current.duration) * 100;
+      setVideoState({ progress });
     }
   };
 
-  const restartVideo = () => {
+  const handleSeek = (value: number[]) => {
     if (videoRef.current) {
-      videoRef.current.currentTime = 0;
-      videoRef.current.play();
-      setIsPlaying(true);
+      const time = (value[0] / 100) * videoRef.current.duration;
+      videoRef.current.currentTime = time;
+      setVideoState({ progress: value[0] });
     }
   };
 
-  const toggleMute = () => {
-    if (videoRef.current) {
-      videoRef.current.muted = !isMuted;
-      setIsMuted(!isMuted);
-    }
-  };
+  const togglePlay = () => setVideoState({ isPlaying: !videoState.isPlaying });
+  const toggleMute = () => setVideoState({ isMuted: !videoState.isMuted });
 
   const goToPreviousScene = () => {
-    if (currentScene > 0) {
-      onSceneChange(currentScene - 1);
+    if (videoState.currentScene > 0) {
+      handleSceneChange(videoState.currentScene - 1);
     }
   };
 
   const goToNextScene = () => {
-    if (currentScene < scenes.length - 1) {
-      onSceneChange(currentScene + 1);
+    if (videoState.currentScene < storyboard.scenes.length - 1) {
+      handleSceneChange(videoState.currentScene + 1);
     }
   };
 
   return (
     <motion.div
-      className="relative aspect-video bg-black rounded-lg overflow-hidden"
+      className="relative aspect-video bg-background/30 rounded-lg border border-sidebar-border overflow-hidden"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
+      transition={{ duration: 0.3 }}
     >
       <video
         ref={videoRef}
         className="w-full h-full object-cover"
-        src={scenes[currentScene].thumbnail}
+        onTimeUpdate={handleTimeUpdate}
         onClick={togglePlay}
+        muted={videoState.isMuted}
       />
-      <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black to-transparent">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <button
-              onClick={goToPreviousScene}
-              className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
-              aria-label="Previous Scene"
-              disabled={currentScene === 0}
-            >
-              <SkipBack className="w-5 h-5" />
-            </button>
-            <button
-              onClick={togglePlay}
-              className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
-              aria-label={isPlaying ? "Pause" : "Play"}
-            >
-              {isPlaying ? (
-                <Pause className="w-5 h-5" />
-              ) : (
-                <Play className="w-5 h-5" />
-              )}
-            </button>
-            <button
-              onClick={goToNextScene}
-              className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
-              aria-label="Next Scene"
-              disabled={currentScene === scenes.length - 1}
-            >
-              <SkipForward className="w-5 h-5" />
-            </button>
-            <button
-              onClick={restartVideo}
-              className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
-              aria-label="Restart"
-            >
-              <RotateCcw className="w-5 h-5" />
-            </button>
-          </div>
-          <div className="flex items-center space-x-2">
-            <span className="text-sm text-white/80">
-              Scene {currentScene + 1} of {scenes.length}
-            </span>
-            <button
-              onClick={toggleMute}
-              className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
-              aria-label={isMuted ? "Unmute" : "Mute"}
-            >
-              {isMuted ? (
-                <VolumeX className="w-5 h-5" />
-              ) : (
-                <Volume2 className="w-5 h-5" />
-              )}
-            </button>
+
+      {/* Scene Navigation Overlays */}
+      <button
+        onClick={goToPreviousScene}
+        disabled={videoState.currentScene === 0}
+        className={cn(
+          "absolute left-4 top-1/2 -translate-y-1/2",
+          "p-2 rounded-full bg-black/20 backdrop-blur-sm",
+          "hover:bg-black/40 transition-colors",
+          "disabled:opacity-50 disabled:cursor-not-allowed"
+        )}
+      >
+        <ChevronLeft className="w-6 h-6" />
+      </button>
+
+      <button
+        onClick={goToNextScene}
+        disabled={videoState.currentScene === storyboard.scenes.length - 1}
+        className={cn(
+          "absolute right-4 top-1/2 -translate-y-1/2",
+          "p-2 rounded-full bg-black/20 backdrop-blur-sm",
+          "hover:bg-black/40 transition-colors",
+          "disabled:opacity-50 disabled:cursor-not-allowed"
+        )}
+      >
+        <ChevronRight className="w-6 h-6" />
+      </button>
+
+      {/* Controls Overlay */}
+      <div className="absolute inset-0 opacity-0 hover:opacity-100 transition-opacity">
+        <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 via-black/40 to-transparent">
+          <div className="space-y-4">
+            {/* Progress Bar */}
+            <Slider
+              value={[videoState.progress]}
+              onValueChange={handleSeek}
+              max={100}
+              step={0.1}
+              className="h-1"
+            />
+
+            {/* Controls */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={togglePlay}
+                  className={cn(
+                    "p-2 rounded-full",
+                    "bg-white/10 hover:bg-white/20",
+                    "backdrop-blur-sm transition-colors"
+                  )}
+                >
+                  {videoState.isPlaying ? (
+                    <Pause className="w-5 h-5" />
+                  ) : (
+                    <Play className="w-5 h-5" />
+                  )}
+                </button>
+
+                <button
+                  onClick={toggleMute}
+                  className={cn(
+                    "p-2 rounded-full",
+                    "bg-white/10 hover:bg-white/20",
+                    "backdrop-blur-sm transition-colors"
+                  )}
+                >
+                  {videoState.isMuted ? (
+                    <VolumeX className="w-5 h-5" />
+                  ) : (
+                    <Volume2 className="w-5 h-5" />
+                  )}
+                </button>
+              </div>
+
+              <div className="flex items-center gap-2 text-sm">
+                <span className="text-white/80">
+                  Scene {videoState.currentScene + 1} of {storyboard.scenes.length}
+                </span>
+                <Badge variant="secondary" className="text-xs">
+                  {storyboard.scenes[videoState.currentScene]?.roll_type}
+                </Badge>
+              </div>
+            </div>
           </div>
         </div>
       </div>

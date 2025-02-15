@@ -381,7 +381,7 @@ const CircleStepIndicator = ({
   currentStep,
   totalSteps,
   size = 80,
-  strokeWidth = 6,
+  strokeWidth = 3,
 }: CircleStepIndicatorProps) => {
   const radius = (size - strokeWidth) / 2;
   const circumference = radius * 2 * Math.PI;

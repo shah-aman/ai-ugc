@@ -1,72 +1,64 @@
 // import Image from "next/image";
 
 import { motion } from "framer-motion";
-import { Share2 } from "lucide-react";
-
-interface Scene {
-  id: number;
-  title: string;
-  duration: string;
-  thumbnail: string;
-}
+import { Camera, Film } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
+import { AdScene } from "../../storyboard-view/components/ad-scene-list/components/ad-scene-card";
 
 interface SceneListProps {
-  scenes: Scene[];
+  scenes: AdScene[];
   currentScene: number;
   onSceneSelect: (sceneIndex: number) => void;
-  onExport: () => void;
 }
 
-export function SceneList({
-  scenes,
-  currentScene,
-  onSceneSelect,
-  onExport,
-}: SceneListProps) {
+export function SceneList({ scenes, currentScene, onSceneSelect }: SceneListProps) {
   return (
-    <motion.div
-      className="bg-[#1c1c1f] p-6 rounded-lg shadow-lg"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: 0.2 }}
-    >
-      <h2 className="text-2xl font-bold mb-4">Scenes</h2>
-      <div className="space-y-4 mb-6 max-h-[400px] overflow-y-auto">
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <h2 className="text-sm font-medium">Scene List</h2>
+        <span className="text-xs text-muted-foreground">
+          {scenes.length} scenes
+        </span>
+      </div>
+
+      <div className="space-y-2">
         {scenes.map((scene, index) => (
-          <motion.div
+          <motion.button
             key={scene.id}
-            className={`flex items-center space-x-4 p-2 rounded-lg cursor-pointer ${
-              index === currentScene ? "bg-[#2c2c2f]" : "hover:bg-[#2c2c2f]"
-            }`}
+            className={cn(
+              "w-full flex items-start gap-3 p-3 rounded-lg text-left",
+              "bg-background/30 border border-sidebar-border",
+              "hover:border-fuchsia-500/50 transition-colors",
+              currentScene === index && "ring-2 ring-fuchsia-500"
+            )}
             onClick={() => onSceneSelect(index)}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.2, delay: index * 0.05 }}
           >
-            <div className="relative w-20 h-12 rounded overflow-hidden">
-              <img
-                src={scene.thumbnail || "/placeholder.svg"}
-                alt={scene.title}
-                // layout="fill"
-                // objectFit="cover"
-                className="object-cover"
-              />
+            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-background/50 shrink-0">
+              {scene.roll_type === "A-roll" ? (
+                <Camera className="w-4 h-4 text-muted-foreground" />
+              ) : (
+                <Film className="w-4 h-4 text-muted-foreground" />
+              )}
             </div>
-            <div>
-              <h3 className="font-semibold">{scene.title}</h3>
-              <p className="text-sm text-gray-400">{scene.duration}</p>
+
+            <div className="min-w-0 flex-1 space-y-1">
+              <div className="flex items-center gap-2">
+                <Badge variant={scene.roll_type === "A-roll" ? "default" : "secondary"} className="text-xs">
+                  {scene.roll_type}
+                </Badge>
+                <span className="text-xs text-muted-foreground">
+                  Scene {index + 1}
+                </span>
+              </div>
+              <p className="text-sm truncate">{scene.content}</p>
             </div>
-          </motion.div>
+          </motion.button>
         ))}
       </div>
-      <button
-        onClick={onExport}
-        className="w-full h-12 bg-gradient-to-b from-[#7c5aff] to-[#6c47ff] rounded-[99px] shadow-[inset_0px_1px_0px_0px_rgba(255,255,255,0.16),0px_1px_2px_0px_rgba(0,0,0,0.20)] justify-center items-center inline-flex overflow-hidden cursor-pointer hover:from-[#8f71ff] hover:to-[#7c5aff] active:from-[#6c47ff] active:to-[#5835ff] transition-all duration-200"
-      >
-        <Share2 className="w-5 h-5 mr-2" />
-        <span className="text-white text-[15px] font-medium">
-          Export Intermediate Video
-        </span>
-      </button>
-    </motion.div>
+    </div>
   );
 }

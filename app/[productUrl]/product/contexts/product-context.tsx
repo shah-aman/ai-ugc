@@ -1,120 +1,175 @@
-import { createContext, useContext, useMemo } from "react";
-
+import { createContext, useContext, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
 
-export const ProductContext = createContext<{
+type VideoState = {
+  isPlaying: boolean;
+  isMuted: boolean;
+  progress: number;
+  currentScene: number;
+};
+
+export type ProductContextType = {
   product: {
     url: string;
     name: string;
     imageUrls: string[];
     description: string;
+    price: string;
+    rating: number;
+    reviews: number;
+    category: string;
+    tags: string[];
     specs: { label: string; value: string }[];
+    features: string[];
+    inStock: boolean;
+    targetAudiences: {
+      name: string;
+      description: string;
+    }[];
   };
   strategy: {
-    targetAudience: string;
-    valueProposition: string;
-    marketingChannels: string[];
-    proposedInfluencers: {
-      id: string;
+    summary: string;
+    keyPoints: string[];
+    metrics: {
+      label: string;
+      value: string;
+      progress?: number;
+      status?: "success" | "warning";
+    }[];
+    influencers: {
       name: string;
+      avatar: string;
+      followers: string;
+      engagement: string;
       socialMedia: {
-        instagram?: string;
-        tiktok?: string;
-        youtube?: string;
-        facebook?: string;
+        [key: string]: string;
       };
       tags: string[];
     }[];
   };
   storyboard: {
     scenes: {
-      type: "a-roll" | "b-roll";
-      title: string;
+      id: number;
+      roll_type: "A-roll" | "B-roll";
+      content: string;
       description: string;
     }[];
   };
   intermediateVideo: {
-    video: {
-      duration: number;
-      url: string;
-    };
+    videoState: VideoState;
+    setVideoState: (updates: Partial<VideoState>) => void;
+    handleSceneChange: (sceneIndex: number) => void;
   };
   finalVideo: {
-    video: {
-      duration: number;
-      url: string;
+    details: {
+      title: string;
+      duration: string;
+      resolution: string;
+      format: string;
+      description: string;
     };
   };
-}>({
+  setProduct: (product: ProductContextType["product"]) => void;
+  setStrategy: (strategy: ProductContextType["strategy"]) => void;
+  setStoryboard: (storyboard: ProductContextType["storyboard"]) => void;
+  setFinalVideo: (finalVideo: ProductContextType["finalVideo"]) => void;
+};
+
+const defaultContext: ProductContextType = {
   product: {
     url: "",
     name: "",
     imageUrls: [],
     description: "",
+    price: "",
+    rating: 0,
+    reviews: 0,
+    category: "",
+    tags: [],
     specs: [],
+    features: [],
+    inStock: false,
+    targetAudiences: [],
   },
   strategy: {
-    targetAudience: "",
-    valueProposition: "",
-    marketingChannels: [],
-    proposedInfluencers: [],
+    summary: "",
+    keyPoints: [],
+    metrics: [],
+    influencers: [],
   },
   storyboard: {
     scenes: [],
   },
   intermediateVideo: {
-    video: {
-      duration: 0,
-      url: "",
+    videoState: {
+      isPlaying: false,
+      isMuted: false,
+      progress: 0,
+      currentScene: 0,
     },
+    setVideoState: () => { },
+    handleSceneChange: () => { },
   },
   finalVideo: {
-    video: {
-      duration: 0,
-      url: "",
+    details: {
+      title: "",
+      duration: "",
+      resolution: "",
+      format: "",
+      description: "",
     },
   },
-});
+  setProduct: () => { },
+  setStrategy: () => { },
+  setStoryboard: () => { },
+  setFinalVideo: () => { },
+};
+
+export const ProductContext = createContext<ProductContextType>(defaultContext);
 
 export function ProductContextProvider({
   children,
-}: React.PropsWithChildren<{}>) {
+}: {
+  children: React.ReactNode;
+}) {
   const params = useParams<{ productUrl: string }>();
   const productUrl = useMemo(
     () => decodeURIComponent(params.productUrl),
     [params],
   );
 
-  const contextValue = {
-    product: {
-      url: productUrl,
-      name: "",
-      imageUrls: [],
-      description: "",
-      specs: [],
-    },
-    strategy: {
-      targetAudience: "",
-      valueProposition: "",
-      marketingChannels: [],
-      proposedInfluencers: [],
-    },
-    storyboard: {
-      scenes: [],
-    },
-    intermediateVideo: {
-      video: {
-        duration: 0,
-        url: "",
-      },
-    },
-    finalVideo: {
-      video: {
-        duration: 0,
-        url: "",
-      },
-    },
+  const [product, setProduct] = useState(defaultContext.product);
+  const [strategy, setStrategy] = useState(defaultContext.strategy);
+  const [storyboard, setStoryboard] = useState(defaultContext.storyboard);
+  const [finalVideo, setFinalVideo] = useState(defaultContext.finalVideo);
+  const [videoState, setVideoState] = useState(defaultContext.intermediateVideo.videoState);
+
+  const handleSceneChange = (sceneIndex: number) => {
+    setVideoState(prev => ({
+      ...prev,
+      currentScene: sceneIndex,
+      isPlaying: false,
+      progress: 0,
+    }));
   };
+
+  const contextValue = {
+    product: { ...product, url: productUrl },
+    strategy,
+    storyboard,
+    intermediateVideo: {
+      videoState,
+      setVideoState: (updates: Partial<VideoState>) =>
+        setVideoState(prev => ({ ...prev, ...updates })),
+      handleSceneChange,
+    },
+    finalVideo,
+    setProduct,
+    setStrategy,
+    setStoryboard,
+    setFinalVideo,
+  };
+
   return (
     <ProductContext.Provider value={contextValue}>
       {children}
