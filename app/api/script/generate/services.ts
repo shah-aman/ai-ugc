@@ -1,13 +1,19 @@
 import { getOpenAI } from "@/lib/ai";
 import { extractStructuredScriptPrompt, generateScriptPrompt } from "./prompts";
-import { extractStructuredScriptSchema } from "./schemas";
+import {
+  ExtractStructuredScriptSchema,
+  extractStructuredScriptSchema,
+} from "./schemas";
 import { zodResponseFormat } from "openai/helpers/zod";
 
 export async function generateScript(
   customer_intent: string,
   product_research: string,
-  influencer_research: string
-) {
+  influencer_research: string,
+): Promise<{
+  unstructuredScript: string;
+  structuredScript: ExtractStructuredScriptSchema;
+}> {
   const openai = getOpenAI();
 
   const unstructuredResponse = await openai.chat.completions.create({
@@ -18,7 +24,7 @@ export async function generateScript(
         content: generateScriptPrompt(
           customer_intent,
           product_research,
-          influencer_research
+          influencer_research,
         ),
       },
     ],
@@ -38,10 +44,20 @@ export async function generateScript(
         content: extractStructuredScriptPrompt(unstructuredScript),
       },
     ],
-    response_format: zodResponseFormat(extractStructuredScriptSchema, "script"),
+    response_format: zodResponseFormat(
+      extractStructuredScriptSchema,
+      "script",
+    ),
   });
 
   const structuredScript = structuredResponse.choices[0].message.parsed;
 
-  return structuredScript;
+  if (!structuredScript) {
+    throw new Error("No structured script generated");
+  }
+
+  return {
+    unstructuredScript,
+    structuredScript,
+  };
 }
