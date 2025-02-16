@@ -32,7 +32,6 @@ export function InfluencersView({ onNextStep }: InfluencersViewProps) {
   } = useProductContext();
 
   useEffect(() => {
-    console.log(data);
     refetch();
   }, [refetch]);
 

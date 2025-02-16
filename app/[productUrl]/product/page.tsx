@@ -111,7 +111,7 @@ export default function StepperDemo() {
                 influencers: () => (
                   <InfluencersView onNextStep={methods.next} />
                 ),
-                storyboard: () => <StoryboardView />,
+                storyboard: () => <StoryboardView onNextStep={methods.next} />,
                 "raw-video": () => <IntermediateVideoView />,
                 "final-video": () => <FinalVideoView />,
               })}
