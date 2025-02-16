@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { generateScript } from "./services";
 import { getSupabase } from "@/supabase/utils";
 
-type RequestBody = {
+export type RequestBody = {
   productLink: string;
   influencerId: string;
 
@@ -21,7 +21,11 @@ export async function POST(request: Request) {
       influencerId,
     }: RequestBody = await request.json();
 
-    if (!customerIntent || !productResearch || !influencerResearch) {
+    if (
+      customerIntent === undefined ||
+      productResearch === undefined ||
+      influencerResearch === undefined
+    ) {
       return NextResponse.json(
         { error: "Missing required fields" },
         { status: 400 },
@@ -50,7 +54,11 @@ export async function POST(request: Request) {
       })
       .select();
 
-    return NextResponse.json({ data, error });
+    if (error !== null) {
+      throw error;
+    }
+
+    return NextResponse.json(data[0]);
   } catch (error) {
     console.error("Error generating script:", error);
     return NextResponse.json(

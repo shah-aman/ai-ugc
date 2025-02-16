@@ -12,7 +12,7 @@ export function AdSceneList({ scenes, onAddScene }: AdSceneListProps) {
       {scenes.map((scene, index) => (
         <AdSceneCard key={scene.id} scene={scene} index={index} />
       ))}
-      <AddSceneCard onAddScene={onAddScene} />
+      {/* <AddSceneCard onAddScene={onAddScene} /> */}
     </div>
   );
 }

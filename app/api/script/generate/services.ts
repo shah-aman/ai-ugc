@@ -9,7 +9,7 @@ import { zodResponseFormat } from "openai/helpers/zod";
 export async function generateScript(
   customerIntent: string,
   productResearch: string,
-  influencerResearch: object,
+  influencerResearch: string,
 ): Promise<{
   unstructuredScript: string;
   structuredScript: ExtractStructuredScriptSchema;

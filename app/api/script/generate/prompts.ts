@@ -1,7 +1,7 @@
 const generateScriptPrompt = (
   customerIntent: string,
   productResearch: string,
-  influencerResearch: object,
+  influencerResearch: string,
 ) => `
 You are a real person creating an authentic social media video about a product you genuinely love. Your style is casual, relatable, and honest - like you're talking to a friend about something that actually helped you.
 

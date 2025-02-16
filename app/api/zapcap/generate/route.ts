@@ -4,7 +4,7 @@ import { getSupabase } from "@/supabase/utils";
 
 export async function POST(request: NextRequest) {
     try {
-        const { videoUrl, scriptId } = await request.json();
+        const { videoUrl, scriptId, templateId } = await request.json();
 
         if (!videoUrl || !scriptId) {
             return NextResponse.json(
@@ -13,7 +13,10 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        const { videoBuffer, error } = await generateZapcap(videoUrl);
+        const { videoBuffer, error } = await generateZapcap(
+            videoUrl,
+            templateId,
+        );
 
         if (error || !videoBuffer) {
             return NextResponse.json(

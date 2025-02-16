@@ -7,6 +7,7 @@ interface ZapcapResponse {
 
 export async function generateZapcap(
   videoUrl: string,
+  templateId: string,
 ): Promise<ZapcapResponse> {
   try {
     // Upload the video to Zapcap
@@ -41,10 +42,12 @@ export async function generateZapcap(
         },
         body: JSON.stringify({
           autoApprove: true,
-          templateId: "9a2b0ed5-231b-4052-9211-5af9dc2de65e",
+          templateId: templateId,
           renderOptions: {
             styleOptions: {
+              // top: 65, // Position subtitles at 85% of video height (near bottom)
               top: 80, // Position subtitles at 85% of video height (near bottom)
+              fontSize: 30,
             },
           },
         }),
