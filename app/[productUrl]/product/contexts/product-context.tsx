@@ -25,6 +25,8 @@ export type ProductContextType = {
   product: UseProductInfoQueryResult;
   marketResearch: UseMarketResearchQueryResult;
   storyboard: UseStoryboardQueryResult;
+  avatarId: string;
+  setAvatarId: (id: string) => void;
   intermediateVideo: UseIntermediateVideoQueryResult;
   finalVideo: UseFinalVideoQueryResult;
   // setProduct: (product: ProductContextType["product"]) => void;
@@ -37,6 +39,8 @@ const defaultContext: ProductContextType = {
   product: {} as UseProductInfoQueryResult,
   marketResearch: {} as UseMarketResearchQueryResult,
   storyboard: {} as UseStoryboardQueryResult,
+  avatarId: "",
+  setAvatarId: () => undefined,
   intermediateVideo: {} as UseIntermediateVideoQueryResult,
   finalVideo: {} as UseFinalVideoQueryResult,
 };
@@ -69,8 +73,9 @@ export function ProductContextProvider({
     influencerResearch: "", // TODO: Add once done
   });
 
+  const [avatarId, setAvatarId] = useState<string>();
   const intermediateVideo = useIntermediateVideo({
-    avatarId: "113eece852cd4d0eb70cfdfa612dd04b",
+    avatarId: avatarId ?? "",
     voiceId: "26b2064088674c80b1e5fc5ab1a068eb",
     script:
       storyboard.data?.script
@@ -100,6 +105,8 @@ export function ProductContextProvider({
     product,
     marketResearch,
     storyboard,
+    avatarId,
+    setAvatarId,
     intermediateVideo,
     finalVideo,
   };

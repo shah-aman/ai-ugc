@@ -1,37 +1,29 @@
 "use client";
 
-import { AdSceneList } from "./components/ad-scene-list";
-import { Button } from "@/components/ui/button";
+import { useEffect } from "react";
+
 import { Download, Play } from "lucide-react";
 
-const adScenes = [
-  {
-    id: 1,
-    roll_type: "A-roll" as const,
-    content: "Okay I have to share this because",
-    description: "Excited, leaning into camera with wide eyes and genuine enthusiasm, speaking in a conspiratorial tone like sharing a secret with friends",
-  },
-  {
-    id: 2,
-    roll_type: "B-roll" as const,
-    content: "it literally changed my skincare game. I was so over trying expensive moisturizers that did nothing.",
-    description: "Close-up of the product being gently applied, showing its texture. Soft, natural lighting highlights the product's consistency and the clean, minimal packaging",
-  },
-  {
-    id: 3,
-    roll_type: "A-roll" as const,
-    content: "But this one? My skin is actually glowing now and it's not even expensive.",
-    description: "Confident and proud expression, gesturing to face to show natural glow, genuine smile with slightly raised eyebrows",
-  },
-  {
-    id: 4,
-    roll_type: "A-roll" as const,
-    content: "You guys need to check this out!",
-    description: "Enthusiastic call-to-action, friendly and encouraging expression, slight forward lean to emphasize importance",
-  }
-];
+import { Button } from "@/components/ui/button";
 
-export function StoryboardView() {
+import { AdSceneList } from "./components/ad-scene-list";
+import { useProductContext } from "../../contexts/product-context";
+import { Skeleton } from "@/components/ui/skeleton";
+
+export type StoryboardViewProps = {
+  onNextStep: () => void;
+};
+
+export function StoryboardView({ onNextStep }: StoryboardViewProps) {
+  const {
+    storyboard: { refetch, data },
+  } = useProductContext();
+
+  useEffect(() => {
+    console.log(data);
+    refetch();
+  }, [refetch]);
+
   const handleAddScene = () => {
     console.log("Adding new scene");
   };
@@ -47,17 +39,16 @@ export function StoryboardView() {
         </div>
 
         <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            className="text-xs gap-2"
-          >
-            <Download className="w-4 h-4" />
-            Export
-          </Button>
+          {/*
+            <Button variant="outline" size="sm" className="text-xs gap-2">
+              <Download className="w-4 h-4" />
+              Export
+            </Button>
+          */}
           <Button
             size="sm"
             className="bg-fuchsia-500 hover:bg-fuchsia-600 text-white text-xs gap-2"
+            disabled={data === undefined}
           >
             <Play className="w-4 h-4" />
             Preview
@@ -65,9 +56,21 @@ export function StoryboardView() {
         </div>
       </div>
 
-      <div className="rounded-lg">
-        <AdSceneList scenes={adScenes} onAddScene={handleAddScene} />
-      </div>
+      {data === undefined ? (
+        <Skeleton className="w-full h-[500px]" />
+      ) : (
+        <div className="rounded-lg">
+          <AdSceneList
+            scenes={data.script.map((scene, index) => ({
+              id: index,
+              roll_type: scene.roll_type,
+              content: scene.content,
+              description: scene.content,
+            }))}
+            onAddScene={handleAddScene}
+          />
+        </div>
+      )}
     </div>
   );
 }

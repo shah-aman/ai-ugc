@@ -168,17 +168,19 @@ export function ProductInfo({ product, onNextStep }: ProductInfoProps) {
       {/* </div> */}
 
       {/* Action Button */}
-      <Button
-        onClick={onNextStep}
-        className={cn(
-          "w-full bg-fuchsia-500 text-white",
-          "hover:bg-fuchsia-600",
-          "focus-visible:ring-2 focus-visible:ring-sidebar-ring focus-visible:outline-none",
-        )}
-        disabled={product === undefined}
-      >
-        Create marketing plan
-      </Button>
+      {product !== undefined && (
+        <Button
+          onClick={onNextStep}
+          className={cn(
+            "w-full bg-fuchsia-500 text-white",
+            "hover:bg-fuchsia-600",
+            "focus-visible:ring-2 focus-visible:ring-sidebar-ring focus-visible:outline-none",
+          )}
+          disabled={product === undefined}
+        >
+          Create marketing plan
+        </Button>
+      )}
     </motion.div>
   );
 }
