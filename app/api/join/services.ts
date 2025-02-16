@@ -243,9 +243,9 @@ export async function joinVideos(
         let filterComplex = brollTimestamps.timestamps
             .map(
                 (timestamp, index) => `
-            [${index + 1}:v]trim=start=0:duration=${
-                    timestamp.end - timestamp.start
-                },setpts=PTS-STARTPTS+${timestamp.start}/TB,scale=${dimensions.width}:${dimensions.height}:force_original_aspect_ratio=decrease,pad=${dimensions.width}:${dimensions.height}:(ow-iw)/2:(oh-ih)/2,setsar=1[v${index}];
+            [${
+                    index + 1
+                }:v]trim=start=0:duration=${5},setpts=PTS-STARTPTS+${timestamp.start}/TB,scale=${dimensions.width}:${dimensions.height}:force_original_aspect_ratio=decrease,pad=${dimensions.width}:${dimensions.height}:(ow-iw)/2:(oh-ih)/2,setsar=1[v${index}];
         `,
             )
             .join("");
@@ -277,22 +277,69 @@ export async function joinVideos(
         const outputPath = path.join(tempDir, "output.mp4");
         const combineCommand =
             `ffmpeg -i "${processedVideoPath}" -i "${mainAudioPath}" -c:v copy -c:a aac -map 0:v:0 -map 1:a:0 "${outputPath}"`;
-
         await execPromise(combineCommand);
 
-        // Read the output file
-        const outputBuffer = await fs.readFile(outputPath);
+        // Overlay background music on top (very quiet, with fade in/out)
+        // 1. Get video duration using ffprobe
+        const durationCommand =
+            `ffprobe -i "${outputPath}" -show_entries format=duration -v quiet -of csv="p=0"`;
+        const { stdout: videoDurationStr } = await execPromise(durationCommand);
+        const videoDuration = parseFloat(videoDurationStr.trim());
 
-        // Upload to Supabase
+        // 2. Pick a random lofi track from 'music' bucket (lofi0.mp3 through lofi4.mp3)
+        const randomIndex = Math.floor(Math.random() * 5);
+        const musicFilename = `lofi${randomIndex}.mp3`;
+        const { data: musicData, error: musicDownloadError } = await supabase
+            .storage
+            .from("music")
+            .download(musicFilename);
+        if (musicDownloadError || !musicData) {
+            throw new Error(
+                `Failed to download music file ${musicFilename}: ${musicDownloadError?.message}`,
+            );
+        }
+        const musicPath = path.join(tempDir, musicFilename);
+        await fs.writeFile(
+            musicPath,
+            Buffer.from(await musicData.arrayBuffer()),
+        );
+
+        // 3. Get music file duration via ffprobe
+        const musicDurationCommand =
+            `ffprobe -i "${musicPath}" -show_entries format=duration -v quiet -of csv="p=0"`;
+        const { stdout: musicDurationStr } = await execPromise(
+            musicDurationCommand,
+        );
+        const musicDuration = parseFloat(musicDurationStr.trim());
+
+        // 4. Calculate a random offset so that the music clip has the same duration as the video
+        let musicOffset = 0;
+        if (musicDuration > videoDuration) {
+            musicOffset = Math.random() * (musicDuration - videoDuration);
+        }
+
+        // 5. Mix the background music with the video's audio:
+        //    - Trim and fade in/out the music (fade durations of 3 seconds)
+        //    - Lower music volume to 0.1
+        //    - Use amix filter to mix the original voice audio with the processed music
+        const finalOutputPath = path.join(tempDir, "final_output.mp4");
+        const mixCommand =
+            `ffmpeg -i "${outputPath}" -ss ${musicOffset} -t ${videoDuration} -i "${musicPath}" -filter_complex "[1:a]afade=t=in:st=0:d=3,afade=t=out:st=${
+                videoDuration - 3 < 0 ? 0 : videoDuration - 3
+            }:d=3,volume=0.1[music];[0:a][music]amix=inputs=2:duration=first:dropout_transition=2[a]" -map 0:v -map "[a]" -c:v copy -c:a aac "${finalOutputPath}"`;
+        await execPromise(mixCommand);
+
+        // Read the final output file (with music overlay)
+        const outputBuffer = await fs.readFile(finalOutputPath);
+
+        // Upload to Supabase storage
         const fileName = `joined-${Date.now()}.mp4`;
-
         const { error: uploadError } = await supabase.storage
             .from("joined-videos")
             .upload(fileName, outputBuffer, {
                 contentType: "video/mp4",
                 cacheControl: "3600",
             });
-
         if (uploadError) {
             throw new Error(
                 `Failed to upload to Supabase: ${uploadError.message}`,
