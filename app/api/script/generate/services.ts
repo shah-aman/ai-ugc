@@ -10,13 +10,10 @@ export async function generateScript(
   customerIntent: string,
   productResearch: string,
   influencerResearch: string,
-): Promise<{
-  unstructuredScript: string;
-  structuredScript: ExtractStructuredScriptSchema;
-}> {
+): Promise<ExtractStructuredScriptSchema> {
   const openai = getOpenAI();
 
-  const unstructuredResponse = await openai.chat.completions.create({
+  const response = await openai.beta.chat.completions.parse({
     model: "o3-mini",
     messages: [
       {
@@ -28,37 +25,20 @@ export async function generateScript(
         ),
       },
     ],
-  });
-
-  const unstructuredScript = unstructuredResponse.choices[0].message.content;
-
-  if (!unstructuredScript) {
-    throw new Error("No script generated");
-  }
-
-  console.log("Unstructured script:", unstructuredScript);
-
-  const structuredResponse = await openai.beta.chat.completions.parse({
-    model: "gpt-4o-mini",
-    messages: [
-      {
-        role: "user",
-        content: extractStructuredScriptPrompt(unstructuredScript),
-      },
-    ],
     response_format: zodResponseFormat(extractStructuredScriptSchema, "script"),
   });
 
-  const structuredScript = structuredResponse.choices[0].message.parsed;
+  const script = response.choices[0].message.parsed;
 
-  console.log("Structured script:", structuredScript);
+  if (!script) {
+    throw new Error("No script generated");
+  }
 
-  if (!structuredScript) {
+  console.log("Script:", script);
+
+  if (!script) {
     throw new Error("No structured script generated");
   }
 
-  return {
-    unstructuredScript,
-    structuredScript,
-  };
+  return script;
 }

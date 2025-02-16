@@ -36,7 +36,7 @@ export async function joinVideos(
     try {
         // Validate B-roll count matches
         const brollSegments = script.script.filter((s) =>
-            s.roll_type === "B-roll"
+            s.roll_type === "B-roll-product" || s.roll_type === "B-roll-generic"
         );
         if (brollSegments.length !== brollVideos.length) {
             throw new Error(

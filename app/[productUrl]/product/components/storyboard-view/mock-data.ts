@@ -8,7 +8,7 @@ export const adScenes = [
   },
   {
     id: 2,
-    roll_type: "B-roll" as const,
+    roll_type: "B-roll-product" as const,
     content:
       "it literally changed my skincare game. I was so over trying expensive moisturizers that did nothing.",
     description:

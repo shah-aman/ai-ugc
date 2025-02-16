@@ -32,13 +32,13 @@ export async function POST(request: Request) {
       );
     }
 
-    const { unstructuredScript, structuredScript } = await generateScript(
+    const script = await generateScript(
       customerIntent,
       productResearch,
       influencerResearch,
     );
 
-    const fullScript = structuredScript.script
+    const fullScript = script.script
       .map((script) => script.content)
       .join("\n");
 
@@ -48,9 +48,8 @@ export async function POST(request: Request) {
       .upsert({
         influencer_id: influencerId,
         product_link: productLink,
-        script_reasoning: unstructuredScript,
-        full_script: fullScript,
-        structured_script: structuredScript.script,
+        structured_script: script.script,
+        full_script: fullScript
       })
       .select();
 

@@ -62,13 +62,13 @@ export async function generateBRollVideos(
   script: ExtractStructuredScriptSchema,
 ): Promise<GeneratedVideo[]> {
   const bRollSegments = script.script.filter(
-    (segment) => segment.roll_type === "B-roll",
+    (segment) => segment.roll_type === "B-roll-product" || segment.roll_type === "B-roll-generic",
   );
 
   const bRollVideos = await Promise.all(
     bRollSegments.map(async (segment) => {
       try {
-        return await generateBRollVideo(imageUrl, segment);
+        return await generateBRollVideo(segment.roll_type === "B-roll-product" ? imageUrl : "https://upload.wikimedia.org/wikipedia/commons/thumb/4/49/A_black_image.jpg/640px-A_black_image.jpg", segment);
       } catch (error) {
         console.error(
           `Failed to generate B-roll for segment: ${segment.content}`,
