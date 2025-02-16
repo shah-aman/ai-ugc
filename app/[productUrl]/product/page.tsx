@@ -23,12 +23,12 @@ export default function StepperDemo() {
     StepperStep,
     StepperTitle,
   } = defineStepper(
-    { id: "product", title: "Product" },
-    { id: "market-strategy", title: "Market Strategy" },
-    { id: "influencers", title: "Influencers" },
-    { id: "storyboard", title: "Storyboard" },
-    // { id: "raw-video", title: "Raw Video" },
-    { id: "final-video", title: "Final Video" },
+    { index: 0, id: "product", title: "Product" },
+    { index: 1, id: "market-strategy", title: "Market Strategy" },
+    { index: 2, id: "influencers", title: "Influencers" },
+    { index: 3, id: "storyboard", title: "Storyboard" },
+    // { index: 4, id: "raw-video", title: "Raw Video" },
+    { index: 5, id: "final-video", title: "Final Video" },
   );
 
   return (
@@ -52,6 +52,7 @@ export default function StepperDemo() {
                     key={step.id}
                     of={step.id}
                     onClick={() => methods.goTo(step.id)}
+                    disabled={step.index > methods.current.index}
                     className={cn(
                       "px-3 py-1.5 rounded-md transition-all duration-200 text-xs min-w-0",
                       "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
