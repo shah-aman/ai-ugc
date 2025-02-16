@@ -214,7 +214,7 @@ export async function POST(request: NextRequest) {
       });
       return NextResponse.json(
         {
-          error: "Influencer avatar_id or voice_id is missing",
+          error: "Influencer new_avatar_id or voice_id is missing",
         },
         { status: 400 },
       );
