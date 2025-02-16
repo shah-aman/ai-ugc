@@ -7,15 +7,15 @@ import { IconSquareRoundedX } from "@tabler/icons-react";
 import { MultiStepLoader as Loader } from "@/components/ui/multi-step-loader";
 
 const LOADING_STATES = [
-  {
-    text: "Idenfitying the target audience",
-  },
-  {
-    text: "Polishing the script",
-  },
-  {
-    text: "Optmizing the perfect voice",
-  },
+  // {
+  //   text: "Idenfitying the target audience",
+  // },
+  // {
+  //   text: "Polishing the script",
+  // },
+  // {
+  //   text: "Optmizing the perfect voice",
+  // },
   {
     text: "Generating A-roll footages",
   },

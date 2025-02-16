@@ -51,8 +51,7 @@ async function getVideoDetails(videoUrl: string) {
     await fs.writeFile(tempFilePath, buffer);
 
     // Get video details using ffprobe
-    const ffprobeCommand =
-      `ffprobe -v quiet -print_format json -show_format -show_streams "${tempFilePath}"`;
+    const ffprobeCommand = `ffprobe -v quiet -print_format json -show_format -show_streams "${tempFilePath}"`;
     const { stdout } = await execPromise(ffprobeCommand);
     const probeData = JSON.parse(stdout);
 
@@ -87,7 +86,10 @@ async function getVideoDetails(videoUrl: string) {
       duration,
       fileFormat: fileFormat.toLowerCase(),
       framerate,
-      resolution: `${width} x ${height}`,
+      resolution: {
+        width,
+        height,
+      },
     };
   } catch (error) {
     console.error("Error getting video details:", error);

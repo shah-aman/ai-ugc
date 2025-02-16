@@ -5,6 +5,15 @@ import { RequestBody } from "@/app/api/ad/generate/route";
 export type FinalVideo = {
   success: true;
   video_url: string;
+  video_details: {
+    duration: number; // in Seconds
+    fileFormat: string;
+    framerate: number;
+    resolution: {
+      width: number;
+      height: number;
+    };
+  };
 };
 
 export type UseFinalVideoQueryResult = UseQueryResult<FinalVideo, Error>;
