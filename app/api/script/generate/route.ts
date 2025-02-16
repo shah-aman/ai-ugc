@@ -39,7 +39,6 @@ export async function POST(request: Request) {
       .from("scripts")
       .select("*")
       .eq("product_link", productLink)
-      .eq("influencer_id", influencerId)
       .maybeSingle();
 
     if (fetchError) {
