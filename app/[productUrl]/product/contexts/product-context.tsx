@@ -96,7 +96,7 @@ export function ProductContextProvider({
     [influencerResearch, selectedInfluencerId],
   );
   const intermediateVideo = useIntermediateVideo({
-    avatarId: selectedInfluencer?.avatar_id ?? "",
+    avatarId: selectedInfluencer?.avatar ?? "",
     voiceId: selectedInfluencer?.voice_id ?? "26b2064088674c80b1e5fc5ab1a068eb",
     script:
       storyboard.data?.structured_script

@@ -15,9 +15,9 @@ if (!process.env.FIRECRAWL_API_KEY) {
   throw Error("FIRECRAWL_API_KEY is not set in environment variables");
 }
 
-const supabase = getSupabase();
-
 export async function POST(request: Request) {
+  const supabase = getSupabase();
+  
   try {
     const { url } = await request.json();
 

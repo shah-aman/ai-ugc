@@ -94,7 +94,7 @@ IMPORTANT FORMATTING RULES:
       data: {
         type: area.name,
         data: validatedData,
-      },
+      } as ResearchData,
       citations: perplexityData.citations || [],
     };
   } catch (error) {

@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { Users, Target, Crosshair } from "lucide-react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";

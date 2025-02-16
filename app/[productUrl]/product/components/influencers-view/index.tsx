@@ -1,14 +1,11 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 import {
-  Instagram,
-  Youtube,
   ExternalLink,
   Sparkles,
   MessageCircle,
-  Users2,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Fuse from "fuse.js";
@@ -43,7 +40,7 @@ export function InfluencersView({ onNextStep }: InfluencersViewProps) {
       threshold: 0.3,
       includeScore: true,
     };
-    return new Fuse(data, options);
+    return new Fuse(data ?? [], options);
   }, [data]);
 
   const searchResults = useMemo(() => {

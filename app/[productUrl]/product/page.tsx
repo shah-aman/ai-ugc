@@ -106,7 +106,7 @@ export default function StepperDemo() {
               {methods.switch({
                 product: () => <ProductView onNextStep={methods.next} />,
                 "market-strategy": () => (
-                  <MarketStrategyView onNextStep={methods.next} />
+                  <MarketStrategyView onNextStep={() => methods.next()} />
                 ),
                 influencers: () => (
                   <InfluencersView onNextStep={methods.next} />

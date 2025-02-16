@@ -4,7 +4,7 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/ui/app-sidebar";
 import { Header } from "@/components/ui/header";
 import { cookies } from "next/headers";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+// import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { GlobalProviders } from "./providers";
 // import { createServerClient } from '@supabase/ssr';
 
@@ -20,7 +20,7 @@ export const viewport: Viewport = {
 
 const SIDEBAR_STATE_COOKIE = "sidebar:state";
 
-const queryClient = new QueryClient();
+// const queryClient = new QueryClient();
 
 export default async function RootLayout({
   children,
@@ -47,7 +47,7 @@ export default async function RootLayout({
 
   return (
     <html lang="en" className="dark">
-      <body className={`dark:bg-background dark:text-white`}>
+      <body suppressHydrationWarning className={`dark:bg-background dark:text-white`}>
         <GlobalProviders>
           <SidebarProvider defaultOpen={sidebarState}>
             <div className="flex h-screen w-[100%]">

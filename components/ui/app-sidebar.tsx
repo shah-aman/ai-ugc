@@ -7,7 +7,7 @@ import {
   GalleryVerticalEnd,
   GlobeIcon,
   LibraryBig,
-  Users,
+  // Users,
 } from "lucide-react";
 import { GiSpikyExplosion } from "react-icons/gi";
 import { NavMain } from "@/components/nav-main";
@@ -51,15 +51,15 @@ const data = {
       icon: GlobeIcon,
     },
     {
-      title: "Content Library",
-      url: "/content-library",
+      title: "Gallery",
+      url: "/gallery",
       icon: LibraryBig,
     },
-    {
-      title: "Influencers",
-      url: "/influencers",
-      icon: Users,
-    },
+    // {
+    //   title: "Influencers",
+    //   url: "/influencers",
+    //   icon: Users,
+    // },
     // {
     //   title: "Market",
     //   url: "/market",

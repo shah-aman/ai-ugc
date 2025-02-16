@@ -99,6 +99,39 @@ export type Database = {
         }
         Relationships: []
       }
+      new_scripts: {
+        Row: {
+          b_roll_used: string[] | null
+          created_at: string
+          full_script: string | null
+          id: string
+          influencer_id: string | null
+          product_link: string | null
+          raw_video_link: string | null
+          script: Json[] | null
+        }
+        Insert: {
+          b_roll_used?: string[] | null
+          created_at?: string
+          full_script?: string | null
+          id?: string
+          influencer_id?: string | null
+          product_link?: string | null
+          raw_video_link?: string | null
+          script?: Json[] | null
+        }
+        Update: {
+          b_roll_used?: string[] | null
+          created_at?: string
+          full_script?: string | null
+          id?: string
+          influencer_id?: string | null
+          product_link?: string | null
+          raw_video_link?: string | null
+          script?: Json[] | null
+        }
+        Relationships: []
+      }
       research: {
         Row: {
           created_at: string
@@ -106,8 +139,10 @@ export type Database = {
           customer_profile: Json | null
           id: string
           product_image_url: string | null
+          product_info: Json | null
           product_link: string
           product_research: Json | null
+          selected_influencer: string | null
           updated_at: string
         }
         Insert: {
@@ -116,8 +151,10 @@ export type Database = {
           customer_profile?: Json | null
           id?: string
           product_image_url?: string | null
+          product_info?: Json | null
           product_link: string
           product_research?: Json | null
+          selected_influencer?: string | null
           updated_at?: string
         }
         Update: {
@@ -126,11 +163,21 @@ export type Database = {
           customer_profile?: Json | null
           id?: string
           product_image_url?: string | null
+          product_info?: Json | null
           product_link?: string
           product_research?: Json | null
+          selected_influencer?: string | null
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "research_selected_influencer_fkey"
+            columns: ["selected_influencer"]
+            isOneToOne: false
+            referencedRelation: "influencers"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       scripts: {
         Row: {
