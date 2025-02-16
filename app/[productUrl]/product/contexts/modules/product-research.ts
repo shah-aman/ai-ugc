@@ -11,14 +11,15 @@ export type UseProductResearchQueryResult = UseQueryResult<
 
 export type ProductResearchParams = {
   productDescription: string;
+  productLink: string;
 };
 
-export async function fetchProductResearch({
-  productDescription,
-}: ProductResearchParams): Promise<ProductResearch> {
+export async function fetchProductResearch(
+  params: ProductResearchParams,
+): Promise<ProductResearch> {
   const response = await fetch(`/api/research/product`, {
     method: "POST",
-    body: JSON.stringify({ productDescription }),
+    body: JSON.stringify(params),
   });
   if (!response.ok) {
     throw new Error("Network response was not ok");

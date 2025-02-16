@@ -1,4 +1,4 @@
-import { createContext, useContext, useMemo, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
 import { useParams } from "next/navigation";
 
@@ -30,8 +30,8 @@ export type ProductContextType = {
   productResearch: UseProductResearchQueryResult;
   influencerResearch: UseInfluencerResearchQueryResult;
   storyboard: UseStoryboardQueryResult;
-  avatarId: string;
-  setAvatarId: (id: string) => void;
+  selectedInfluencerId: string;
+  setSelectedInfluencerId: (id: string) => void;
   intermediateVideo: UseIntermediateVideoQueryResult;
   finalVideo: UseFinalVideoQueryResult;
   // setProduct: (product: ProductContextType["product"]) => void;
@@ -45,8 +45,8 @@ const defaultContext: ProductContextType = {
   productResearch: {} as UseProductResearchQueryResult,
   influencerResearch: {} as UseInfluencerResearchQueryResult,
   storyboard: {} as UseStoryboardQueryResult,
-  avatarId: "",
-  setAvatarId: () => undefined,
+  selectedInfluencerId: "",
+  setSelectedInfluencerId: () => undefined,
   intermediateVideo: {} as UseIntermediateVideoQueryResult,
   finalVideo: {} as UseFinalVideoQueryResult,
 };
@@ -68,7 +68,13 @@ export function ProductContextProvider({
 
   const productResearch = useProductResearch({
     productDescription: product.data?.description ?? "",
+    productLink: productUrl,
   });
+  useEffect(() => {
+    if (product.data?.description !== undefined) {
+      productResearch.refetch();
+    }
+  }, [productResearch, product]);
 
   const influencerResearch = useInfluencerResearch();
 
@@ -83,12 +89,15 @@ export function ProductContextProvider({
     influencerId: "54e6c27f-c6dd-4ba0-9b69-823771ed49cd",
   });
 
-  console.log(storyboard.data);
-
-  const [avatarId, setAvatarId] = useState<string>();
+  const [selectedInfluencerId, setSelectedInfluencerId] = useState<string>();
+  const selectedInfluencer = useMemo(
+    () =>
+      influencerResearch.data?.find(({ id }) => id === selectedInfluencerId),
+    [influencerResearch, selectedInfluencerId],
+  );
   const intermediateVideo = useIntermediateVideo({
-    avatarId: avatarId ?? "",
-    voiceId: "26b2064088674c80b1e5fc5ab1a068eb",
+    avatarId: selectedInfluencer?.avatar_id ?? "",
+    voiceId: selectedInfluencer?.voice_id ?? "26b2064088674c80b1e5fc5ab1a068eb",
     script:
       storyboard.data?.structured_script
         ?.map(
@@ -118,8 +127,8 @@ export function ProductContextProvider({
     productResearch,
     influencerResearch,
     storyboard,
-    avatarId,
-    setAvatarId,
+    selectedInfluencerId,
+    setSelectedInfluencerId,
     intermediateVideo,
     finalVideo,
   };

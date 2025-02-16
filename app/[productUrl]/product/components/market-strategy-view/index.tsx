@@ -17,12 +17,8 @@ export type MarketStrategyViewProps = {
 
 export function MarketStrategyView({ onNextStep }: MarketStrategyViewProps) {
   const {
-    productResearch: { refetch, data },
+    productResearch: { data },
   } = useProductContext();
-
-  useEffect(() => {
-    refetch();
-  }, [refetch]);
 
   return (
     <div className="space-y-6 w-full">

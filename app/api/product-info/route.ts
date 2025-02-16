@@ -1,9 +1,11 @@
 import { NextResponse } from "next/server";
+
 import FirecrawlApp, { ScrapeResponse } from "@mendable/firecrawl-js";
 import { Groq } from "groq-sdk";
+
+import { getSupabase } from "@/supabase/utils";
+
 import { productSchema } from "./schema";
-import { createClient } from "@supabase/supabase-js";
-import type { Database } from "@/supabase/types";
 
 if (!process.env.GROQ_API_KEY) {
   throw Error("GROQ_API_KEY is not set in environment variables");
@@ -13,14 +15,7 @@ if (!process.env.FIRECRAWL_API_KEY) {
   throw Error("FIRECRAWL_API_KEY is not set in environment variables");
 }
 
-if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
-  throw Error("Supabase environment variables are not set");
-}
-
-const supabase = createClient<Database>(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY
-);
+const supabase = getSupabase();
 
 export async function POST(request: Request) {
   try {
@@ -36,14 +31,14 @@ export async function POST(request: Request) {
     const { data: existingRecord } = await supabase
       .from("research")
       .select()
-      .eq('product_link', url)
-      .not('product_info', 'is', null)
+      .eq("product_link", url)
+      .not("product_info", "is", null)
       .single();
 
     if (existingRecord?.product_info) {
       return NextResponse.json({
         ...existingRecord.product_info,
-        id: existingRecord.id
+        id: existingRecord.id,
       });
     }
 
@@ -205,31 +200,33 @@ export async function POST(request: Request) {
       const validatedData = productSchema.parse(extractedInfo);
 
       const { data: researchRecord, error: supabaseError } = await supabase
-        .from('research')
-        .upsert({
-          product_link: url,
-          product_info: validatedData,
-          customer_intent: null,
-          customer_profile: null,
-        },
-        { 
-          onConflict: 'product_link',
-          ignoreDuplicates: false 
-        })
+        .from("research")
+        .upsert(
+          {
+            product_link: url,
+            product_info: validatedData,
+            customer_intent: null,
+            customer_profile: null,
+          },
+          {
+            onConflict: "product_link",
+            ignoreDuplicates: false,
+          },
+        )
         .select()
         .single();
 
       if (supabaseError) {
-        console.error('Supabase error:', supabaseError);
+        console.error("Supabase error:", supabaseError);
         return NextResponse.json(
           { error: "Failed to save product information" },
-          { status: 500 }
+          { status: 500 },
         );
       }
 
       return NextResponse.json({
         ...validatedData,
-        id: researchRecord.id
+        id: researchRecord.id,
       });
     } catch (scrapeError) {
       console.error(
