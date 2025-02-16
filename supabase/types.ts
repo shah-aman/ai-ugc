@@ -9,6 +9,33 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      avatars: {
+        Row: {
+          avatar_id: string
+          created_at: string
+          description: string | null
+          gender: string | null
+          image_url: string | null
+          name: string | null
+        }
+        Insert: {
+          avatar_id: string
+          created_at?: string
+          description?: string | null
+          gender?: string | null
+          image_url?: string | null
+          name?: string | null
+        }
+        Update: {
+          avatar_id?: string
+          created_at?: string
+          description?: string | null
+          gender?: string | null
+          image_url?: string | null
+          name?: string | null
+        }
+        Relationships: []
+      }
       b_roll: {
         Row: {
           created_at: string
@@ -38,28 +65,37 @@ export type Database = {
       }
       influencers: {
         Row: {
+          avatar_id: string | null
           created_at: string
           id: string
+          image_url: string | null
           influencer_research: Json | null
           name: string
           tiktok_profile_link: string | null
           updated_at: string
+          voice_id: string | null
         }
         Insert: {
+          avatar_id?: string | null
           created_at?: string
           id?: string
+          image_url?: string | null
           influencer_research?: Json | null
           name: string
           tiktok_profile_link?: string | null
           updated_at?: string
+          voice_id?: string | null
         }
         Update: {
+          avatar_id?: string | null
           created_at?: string
           id?: string
+          image_url?: string | null
           influencer_research?: Json | null
           name?: string
           tiktok_profile_link?: string | null
           updated_at?: string
+          voice_id?: string | null
         }
         Relationships: []
       }
@@ -69,6 +105,7 @@ export type Database = {
           customer_intent: Json | null
           customer_profile: Json | null
           id: string
+          product_image_url: string | null
           product_link: string
           product_research: Json | null
           updated_at: string
@@ -78,6 +115,7 @@ export type Database = {
           customer_intent?: Json | null
           customer_profile?: Json | null
           id?: string
+          product_image_url?: string | null
           product_link: string
           product_research?: Json | null
           updated_at?: string
@@ -87,6 +125,7 @@ export type Database = {
           customer_intent?: Json | null
           customer_profile?: Json | null
           id?: string
+          product_image_url?: string | null
           product_link?: string
           product_research?: Json | null
           updated_at?: string
