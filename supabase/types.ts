@@ -17,6 +17,7 @@ export type Database = {
           gender: string | null
           image_url: string | null
           name: string | null
+          premium: boolean | null
         }
         Insert: {
           avatar_id: string
@@ -25,6 +26,7 @@ export type Database = {
           gender?: string | null
           image_url?: string | null
           name?: string | null
+          premium?: boolean | null
         }
         Update: {
           avatar_id?: string
@@ -33,6 +35,7 @@ export type Database = {
           gender?: string | null
           image_url?: string | null
           name?: string | null
+          premium?: boolean | null
         }
         Relationships: []
       }
@@ -67,10 +70,12 @@ export type Database = {
         Row: {
           avatar_id: string | null
           created_at: string
+          gender: string | null
           id: string
           image_url: string | null
           influencer_research: Json | null
           name: string
+          new_avatar_id: string | null
           tiktok_profile_link: string | null
           updated_at: string
           voice_id: string | null
@@ -78,10 +83,12 @@ export type Database = {
         Insert: {
           avatar_id?: string | null
           created_at?: string
+          gender?: string | null
           id?: string
           image_url?: string | null
           influencer_research?: Json | null
           name: string
+          new_avatar_id?: string | null
           tiktok_profile_link?: string | null
           updated_at?: string
           voice_id?: string | null
@@ -89,10 +96,12 @@ export type Database = {
         Update: {
           avatar_id?: string | null
           created_at?: string
+          gender?: string | null
           id?: string
           image_url?: string | null
           influencer_research?: Json | null
           name?: string
+          new_avatar_id?: string | null
           tiktok_profile_link?: string | null
           updated_at?: string
           voice_id?: string | null

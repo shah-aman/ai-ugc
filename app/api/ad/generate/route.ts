@@ -142,33 +142,13 @@ export async function POST(request: NextRequest) {
 
     console.log("Influencer data retrieved:", {
       influencerId: influencerData.id,
-      hasAvatar: !!influencerData.avatar_id,
+      hasAvatar: !!influencerData.new_avatar_id,
       hasVoice: !!influencerData.voice_id,
     });
 
-    const { avatar_id } = influencerData;
-
-    // TEMP
-    const { data: avatarData, error: avatarError } = await supabase
-      .from("avatars")
-      .select("*")
-      .eq("avatar_id", avatar_id)
-      .single();
-
-    if (avatarError) {
-      console.error("Failed to fetch avatar:", avatarError);
-      return NextResponse.json(
-        { error: avatarError.message },
-        {
-          status: 500,
-        },
-      );
-    }
-
-    const voice_id =
-      avatarData.gender === "male"
-        ? "26b2064088674c80b1e5fc5ab1a068ec"
-        : "26b2064088674c80b1e5fc5ab1a068eb";
+    const voice_id = influencerData.gender === "male"
+      ? "26b2064088674c80b1e5fc5ab1a068ec"
+      : "26b2064088674c80b1e5fc5ab1a068eb";
 
     const { full_script, structured_script, product_link } = scriptRow;
 
