@@ -24,6 +24,7 @@ import {
   useInfluencerResearch,
   UseInfluencerResearchQueryResult,
 } from "./modules/influencer-research";
+import { ExtractStructuredScriptSchema } from "@/app/api/script/generate/schemas";
 
 export type ProductContextType = {
   product: UseProductInfoQueryResult;
@@ -96,10 +97,13 @@ export function ProductContextProvider({
     [influencerResearch, selectedInfluencerId],
   );
   const intermediateVideo = useIntermediateVideo({
-    avatarId: selectedInfluencer?.avatar ?? "",
+    avatarId: selectedInfluencer?.avatar_id ?? "",
     voiceId: selectedInfluencer?.voice_id ?? "26b2064088674c80b1e5fc5ab1a068eb",
     script:
-      storyboard.data?.structured_script
+      (
+        storyboard.data
+          ?.structured_script as ExtractStructuredScriptSchema["script"]
+      )
         ?.map(
           (scene) =>
             `Roll type: ${scene!.roll_type}\nDescription: ${scene!.description}\nContent: "${scene!.content}"`,

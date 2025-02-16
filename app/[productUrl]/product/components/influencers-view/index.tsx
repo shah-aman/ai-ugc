@@ -2,11 +2,7 @@
 
 import { useMemo, useState } from "react";
 
-import {
-  ExternalLink,
-  Sparkles,
-  MessageCircle,
-} from "lucide-react";
+import { ExternalLink, Sparkles, MessageCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Fuse from "fuse.js";
 
@@ -126,7 +122,7 @@ export function InfluencersView({ onNextStep }: InfluencersViewProps) {
                   {/* Profile Header */}
                   <div className="flex items-start gap-4">
                     <motion.img
-                      src={influencer.image_url}
+                      src={influencer.image_url ?? undefined}
                       alt={influencer.name}
                       className="w-14 h-14 rounded-xl object-cover"
                       whileHover={{ scale: 1.05 }}
@@ -148,7 +144,7 @@ export function InfluencersView({ onNextStep }: InfluencersViewProps) {
                           size="icon"
                           className="h-6 w-6 rounded-lg opacity-50 hover:opacity-100"
                         >
-                          <a href={influencer.tiktok_profile_link}>
+                          <a href={influencer.tiktok_profile_link ?? undefined}>
                             <svg
                               className="h-3 w-3"
                               viewBox="0 0 24 24"
@@ -188,7 +184,7 @@ export function InfluencersView({ onNextStep }: InfluencersViewProps) {
                       size="icon"
                       className="opacity-0 group-hover:opacity-100 transition-opacity"
                     >
-                      <a href={influencer.tiktok_profile_link}>
+                      <a href={influencer.tiktok_profile_link ?? undefined}>
                         <ExternalLink className="w-4 h-4" />
                       </a>
                     </Button>

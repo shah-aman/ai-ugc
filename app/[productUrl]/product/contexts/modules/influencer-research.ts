@@ -1,15 +1,9 @@
 import { useQuery, UseQueryResult } from "@tanstack/react-query";
 
-export type InfluencerResearch = {
-  name: string;
-  avatar: string;
-  followers: string;
-  engagement: string;
-  socialMedia: {
-    [key: string]: string;
-  };
-  tags: string[];
-}[];
+import { Database } from "@/supabase/types";
+
+export type InfluencerResearch =
+  Database["public"]["Tables"]["influencers"]["Row"][];
 
 export type UseInfluencerResearchQueryResult = UseQueryResult<
   InfluencerResearch,

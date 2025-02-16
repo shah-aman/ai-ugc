@@ -12,7 +12,7 @@ export type ProductInfoParams = {
 
 export async function fetchProductInfo({
   productUrl,
-}: ProductInfoParams): Promise<{ success: boolean; data: ProductInfo }> {
+}: ProductInfoParams): Promise<ProductInfo> {
   const response = await fetch(`/api/product-info`, {
     method: "POST",
     body: JSON.stringify({ url: productUrl }),
