@@ -2,6 +2,10 @@ import requests
 from typing import List, Dict
 from supabase import create_client
 import os
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv('.env.local')
 
 # Initialize Supabase client
 supabase_url = os.getenv("SUPABASE_URL")
@@ -14,12 +18,17 @@ def get_heygen_avatars() -> List[Dict[str, str]]:
     (first instance of each person only).
     
     Returns:
-        List of dicts containing avatar_id, name, and gender for unique avatars
+        List of dicts containing avatar_id, name (first word only), gender, and image_url
     """
     url = "https://api.heygen.com/v2/avatars"
     
+    # Add HeyGen API key to headers
+    headers = {
+        "X-Api-Key": os.getenv("HEYGEN_API_KEY")
+    }
+    
     try:
-        response = requests.get(url)
+        response = requests.get(url, headers=headers)
         response.raise_for_status()
         
         data = response.json()
@@ -41,8 +50,9 @@ def get_heygen_avatars() -> List[Dict[str, str]]:
             seen_people.add(person_name)
             unique_avatars.append({
                 'avatar_id': avatar['avatar_id'],
-                'name': avatar['avatar_name'],
-                'gender': avatar['gender']
+                'name': person_name,  # Only store the first word
+                'gender': avatar['gender'],
+                'image_url': avatar['preview_image_url']
             })
         
         return unique_avatars
@@ -57,10 +67,17 @@ def update_supabase_avatars(avatars: List[Dict[str, str]]) -> None:
     Upserts the data to avoid duplicates.
     """
     try:
-        # Upsert the avatars data
+        # Specify the columns explicitly
         result = supabase.table('avatars').upsert(
-            avatars,
-            on_conflict='avatar_id'  # Assuming avatar_id is the primary key
+            [
+                {
+                    'avatar_id': avatar['avatar_id'],
+                    'name': avatar['name'],
+                    'gender': avatar['gender'],
+                    'image_url': avatar['image_url']
+                }
+                for avatar in avatars
+            ]
         ).execute()
         
         print(f"Successfully updated {len(avatars)} avatars in Supabase")
@@ -74,7 +91,8 @@ if __name__ == "__main__":
     # Test the functions
     avatars = get_heygen_avatars()
     for avatar in avatars:
-        print(f"Avatar ID: {avatar['avatar_id']}, Name: {avatar['name']}, Gender: {avatar['gender']}")
+        print(f"Avatar ID: {avatar['avatar_id']}, Name: {avatar['name']}, Gender: {avatar['gender']}, Image URL: {avatar['image_url']}")
     
     # Update Supabase with the fetched avatars
-    update_supabase_avatars(avatars)
+    if avatars:
+        update_supabase_avatars(avatars)
