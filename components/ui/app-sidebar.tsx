@@ -108,12 +108,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader className="pb-2">
-        <div className="flex items-center gap-2 px-0 pt-2 pb-2 transition-all duration-300 ease-in-out group-data-[state=collapsed]:px-0">
+        <div className="flex items-center gap-1 px-0 pt-2 pb-2 transition-all duration-300 ease-in-out group-data-[state=collapsed]:px-0">
           <div className="flex items-center justify-center w-8 h-8 transition-all duration-300 ease-in-out">
             <GiSpikyExplosion className="h-6 w-6 bg-fuchsia-500 text-white p-1 rounded-md transition-all duration-300 ease-in-out" />
           </div>
           <span
-            className={`${instrumentSerif.className} font-light text-2xl text-fuchsia-400 opacity-100 transition-all duration-300 ease-in-out group-data-[state=collapsed]:hidden`}
+            className={`${instrumentSerif.className} font-light mb-1 text-2xl text-fuchsia-400 opacity-100 transition-all duration-300 ease-in-out group-data-[state=collapsed]:hidden tracking-[0.015em]`}
           >
             supernova
           </span>

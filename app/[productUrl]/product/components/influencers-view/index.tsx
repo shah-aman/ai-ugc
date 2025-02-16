@@ -64,26 +64,38 @@ export function InfluencersView({ onNextStep }: InfluencersViewProps) {
         </div>
 
         {/* Search Bar */}
-        <div
-          className={cn(
-            "relative w-full rounded-xl",
-            "bg-white/40 dark:bg-zinc-900/40 backdrop-blur-sm",
-            "ring-1 ring-zinc-200/50 dark:ring-zinc-800/50",
-            "focus-within:ring-primary/20 dark:focus-within:ring-primary/20",
-            "transition duration-200",
-          )}
-        >
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search by name, values, or content style..."
+        <div className="flex gap-4">
+          <div
             className={cn(
-              "w-full bg-transparent px-4 py-3 text-sm",
-              "rounded-xl outline-none",
-              "placeholder:text-muted-foreground/60",
+              "relative flex-1 rounded-xl",
+              "bg-white/40 dark:bg-zinc-900/40 backdrop-blur-sm",
+              "ring-1 ring-zinc-200/50 dark:ring-zinc-800/50",
+              "focus-within:ring-primary/20 dark:focus-within:ring-primary/20",
+              "transition duration-200",
             )}
-          />
+          >
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search by name, values, or content style..."
+              className={cn(
+                "w-full bg-transparent px-4 py-3 text-sm",
+                "rounded-xl outline-none",
+                "placeholder:text-muted-foreground/60",
+              )}
+            />
+          </div>
+          <Button
+            onClick={onNextStep}
+            className={cn(
+              "bg-fuchsia-500 text-white",
+              "hover:bg-fuchsia-600",
+            )}
+            disabled={selectedInfluencerId === undefined}
+          >
+            Generate script
+          </Button>
         </div>
       </div>
 
@@ -283,18 +295,6 @@ export function InfluencersView({ onNextStep }: InfluencersViewProps) {
           </AnimatePresence>
         </div>
       )}
-
-      <Button
-        onClick={onNextStep}
-        className={cn(
-          "w-full bg-fuchsia-500 text-white",
-          "hover:bg-fuchsia-600",
-          "focus-visible:ring-2 focus-visible:ring-sidebar-ring focus-visible:outline-none",
-        )}
-        disabled={selectedInfluencerId === undefined}
-      >
-        Generate script
-      </Button>
 
       {/* Empty State - Show when no influencers match search */}
       {searchResults.length === 0 && (

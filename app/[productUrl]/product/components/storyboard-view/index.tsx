@@ -52,7 +52,7 @@ export function StoryboardView({ onNextStep }: StoryboardViewProps) {
             onClick={onNextStep}
           >
             <Play className="w-4 h-4" />
-            Preview
+            Generate
           </Button>
         </div>
       </div>

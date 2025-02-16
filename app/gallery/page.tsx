@@ -30,11 +30,13 @@ type GalleryData = {
     bRoll: Array<Tables<"b_roll">>;
 };
 
-// Add this new type for script segments
 type ScriptSegment = {
-    text: string;
-    startTime: number;
-    endTime: number;
+    content?: string;
+    text?: string;
+    roll_type: string;
+    description?: string;
+    start?: number;
+    end?: number;
 };
 
 export default function GalleryPage() {
@@ -87,7 +89,7 @@ export default function GalleryPage() {
                 </p>
             </header>
 
-            <div className="space-y-12">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {Object.entries(productGroups).map(([productLink, group]) => (
                     <ProductSection
                         key={productLink}
@@ -113,14 +115,16 @@ function ProductSection({ productLink, group }: { productLink: string; group: Pr
         <div className="space-y-4">
             <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                    <h2 className="text-lg font-medium">{group.research?.product_info?.name ?? "Untitled Product"}</h2>
+                    <h2 className="text-lg font-medium truncate">
+                        {group.research?.product_info?.name ?? "Untitled Product"}
+                    </h2>
                     <Button
                         variant="outline"
                         size="sm"
                         onClick={handleProductClick}
+                        className="shrink-0"
                     >
-                        <ExternalLink className="w-4 h-4 mr-2" />
-                        View Product Details
+                        <ExternalLink className="w-4 h-4" />
                     </Button>
                 </div>
                 <p className="text-sm text-muted-foreground line-clamp-2">
@@ -128,18 +132,14 @@ function ProductSection({ productLink, group }: { productLink: string; group: Pr
                 </p>
             </div>
 
-            <div className="relative">
-                <div className="flex overflow-x-auto pb-4 -mx-6 px-6 scrollbar-hide">
-                    <div className="flex gap-4 min-w-full">
-                        {group.scripts.map((script) => (
-                            <VideoCard
-                                key={script.id}
-                                script={script}
-                                research={group.research}
-                            />
-                        ))}
-                    </div>
-                </div>
+            <div className="space-y-4">
+                {group.scripts.map((script) => (
+                    <VideoCard
+                        key={script.id}
+                        script={script}
+                        research={group.research}
+                    />
+                ))}
             </div>
         </div>
     );
@@ -200,13 +200,12 @@ function VideoCard({
                     "group cursor-pointer overflow-hidden transition-all duration-200",
                     "hover:shadow-md hover:border-primary/20",
                     "bg-background/50 border-sidebar-border",
-                    "w-[300px] flex-none"
                 )}
                 onClick={handleClick}
                 onMouseEnter={handleMouseEnter}
                 onMouseLeave={handleMouseLeave}
             >
-                <div className="relative" style={{ aspectRatio: '9/16' }}>
+                <div className="relative" style={{ aspectRatio: '16/9' }}>
                     {script.processed_video_link ? (
                         <>
                             <video
@@ -241,17 +240,9 @@ function VideoCard({
                         </div>
                     </div>
 
-                    <p className="text-xs text-muted-foreground line-clamp-3">
+                    <p className="text-xs text-muted-foreground line-clamp-2">
                         {script.full_script}
                     </p>
-
-                    <div className="flex flex-wrap gap-1">
-                        {research?.product_research?.summary?.productSummary?.keyInsights?.slice(0, 2).map((insight, i) => (
-                            <Badge key={i} variant="secondary" className="text-[10px]">
-                                {insight}
-                            </Badge>
-                        ))}
-                    </div>
                 </CardContent>
             </Card>
 
@@ -280,26 +271,64 @@ function VideoDialog({
     const [scriptSegments, setScriptSegments] = useState<ScriptSegment[]>([]);
 
     useEffect(() => {
-        const segments = script.full_script?.split('. ').map((segment, index) => ({
-            text: segment.trim(),
-            startTime: index * 5,
-            endTime: (index + 1) * 5,
-        })) || [];
+        if (script.structured_script) {
+            try {
+                const rawSegments = typeof script.structured_script === 'string'
+                    ? JSON.parse(script.structured_script)
+                    : script.structured_script;
 
-        setScriptSegments(segments);
-    }, [script.full_script]);
+                // Normalize the segments to handle both formats
+                const normalizedSegments = rawSegments.map((segment: ScriptSegment) => ({
+                    content: segment.content || segment.text || '',
+                    roll_type: segment.roll_type,
+                    description: segment.description || segment.text || '',
+                    start: segment.start || 0,
+                    end: segment.end || 0
+                }));
+
+                setScriptSegments(normalizedSegments);
+            } catch (error) {
+                console.error("Error parsing structured script:", error);
+                setScriptSegments([]);
+            }
+        }
+    }, [script.structured_script]);
 
     const handleTimeUpdate = (time: number) => {
         setCurrentTime(time);
     };
 
-    const handleShare = () => {
-        console.log("Sharing video...");
+    const getRollTypeClass = (rollType: string) => {
+        switch (rollType) {
+            case 'A-roll':
+                return 'bg-zinc-50 dark:bg-zinc-900';
+            case 'B-roll-product':
+            case 'B-roll':
+                return 'bg-zinc-50 dark:bg-zinc-900';
+            case 'B-roll-generic':
+                return 'bg-zinc-50 dark:bg-zinc-900';
+            default:
+                return 'bg-zinc-50 dark:bg-zinc-900';
+        }
+    };
+
+    const getRollTypeTagClass = (rollType: string) => {
+        switch (rollType) {
+            case 'A-roll':
+                return 'bg-zinc-100 dark:bg-zinc-800';
+            case 'B-roll-product':
+            case 'B-roll':
+                return 'bg-zinc-100 dark:bg-zinc-800';
+            case 'B-roll-generic':
+                return 'bg-zinc-100 dark:bg-zinc-800';
+            default:
+                return 'bg-zinc-100 dark:bg-zinc-800';
+        }
     };
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="max-w-7xl">
+            <DialogContent className="max-w-7xl border-none bg-background/95 backdrop-blur-sm">
                 <DialogTitle className="sr-only">
                     Video Preview - {script.full_script?.slice(0, 50)}...
                 </DialogTitle>
@@ -334,7 +363,7 @@ function VideoDialog({
 
                     <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
                         <div className="lg:col-span-2 order-1">
-                            <div className="bg-background/30 rounded-lg border border-sidebar-border overflow-hidden max-w-[400px] mx-auto h-full">
+                            <div className="bg-black rounded-lg overflow-hidden max-w-[400px] mx-auto h-full">
                                 <div className="relative h-full" style={{ aspectRatio: '9/16' }}>
                                     <VideoPlayer
                                         videoUrl={script.processed_video_link || ""}
@@ -345,54 +374,66 @@ function VideoDialog({
                             </div>
                         </div>
                         <div className="lg:col-span-3 order-2">
-                            <div className="space-y-6">
-                                <div className="space-y-4 bg-background/30 rounded-lg border border-sidebar-border p-4">
-                                    <div className="space-y-1.5">
+                            <div className="h-full">
+                                <div className="space-y-4">
+                                    <div className="flex items-center justify-between">
                                         <div className="flex items-center gap-2 text-muted-foreground">
                                             <FileVideo className="w-4 h-4" />
-                                            <span className="text-xs font-medium">Script</span>
+                                            <span className="text-sm font-medium">Script Timeline</span>
                                         </div>
-                                        <div className="h-[600px] overflow-y-auto space-y-2">
-                                            {scriptSegments.map((segment, index) => (
-                                                <div
-                                                    key={index}
-                                                    className={cn(
-                                                        "p-2 rounded transition-colors",
-                                                        currentTime >= segment.startTime && currentTime < segment.endTime
-                                                            ? "bg-primary/10"
-                                                            : "bg-transparent"
-                                                    )}
-                                                >
-                                                    <p className="text-sm">{segment.text}</p>
-                                                    <span className="text-xs text-muted-foreground">
-                                                        {Math.floor(segment.startTime)}s - {Math.floor(segment.endTime)}s
-                                                    </span>
-                                                </div>
-                                            ))}
-                                        </div>
+                                        <span className="text-sm text-muted-foreground">
+                                            {scriptSegments.length} segments
+                                        </span>
                                     </div>
-                                </div>
+                                    <div className="h-[600px] overflow-y-auto space-y-3 p-4">
+                                        {scriptSegments.map((segment, index) => (
+                                            <div
+                                                key={index}
+                                                className={cn(
+                                                    "p-4 rounded-lg transition-all duration-200",
+                                                    getRollTypeClass(segment.roll_type),
+                                                    currentTime >= (segment.start || 0) && currentTime <= (segment.end || 0)
+                                                        ? "ring-1 ring-zinc-200 dark:ring-zinc-700 shadow-sm"
+                                                        : ""
+                                                )}
+                                            >
+                                                <div className="space-y-3">
+                                                    <div className="flex items-center justify-between">
+                                                        <div className="flex items-center gap-2">
+                                                            <div className={cn(
+                                                                "px-2 py-0.5 rounded-full text-[11px] uppercase font-semibold",
+                                                                getRollTypeTagClass(segment.roll_type)
+                                                            )}>
+                                                                {segment.roll_type === 'A-roll' ? 'Speaking' : 'B-Roll'}
+                                                            </div>
+                                                            <span className="text-[11px] text-muted-foreground/60 font-mono tabular-nums">
+                                                                {segment.start?.toFixed(1)}s
+                                                            </span>
+                                                        </div>
+                                                        <Badge variant="outline" className="text-[10px]">
+                                                            {`Segment ${index + 1}`}
+                                                        </Badge>
+                                                    </div>
 
-                                <div className="flex flex-col gap-2">
-                                    <Button
-                                        onClick={handleShare}
-                                        className={cn(
-                                            "w-full bg-fuchsia-500 text-white",
-                                            "hover:bg-fuchsia-600",
-                                            "focus-visible:ring-2 focus-visible:ring-sidebar-ring focus-visible:outline-none"
-                                        )}
-                                    >
-                                        <Share2 className="w-4 h-4 mr-2" />
-                                        Share Video
-                                    </Button>
-
-                                    <Button
-                                        variant="outline"
-                                        className="w-full"
-                                    >
-                                        <FileVideo className="w-4 h-4 mr-2" />
-                                        Download
-                                    </Button>
+                                                    <div className="space-y-3">
+                                                        <p className="text-sm leading-relaxed text-foreground">
+                                                            {segment.content || segment.text}
+                                                        </p>
+                                                        {segment.description && segment.description !== segment.content && (
+                                                            <div className="flex gap-2 items-start pt-1">
+                                                                <Badge variant="secondary" className="shrink-0 text-[10px] font-medium uppercase tracking-wide">
+                                                                    Shot Details
+                                                                </Badge>
+                                                                <p className="text-xs leading-relaxed text-muted-foreground">
+                                                                    {segment.description}
+                                                                </p>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -411,23 +452,17 @@ function GalleryLoadingSkeleton() {
                 <Skeleton className="h-4 w-96" />
             </header>
 
-            <div className="space-y-12">
-                {[1, 2].map((i) => (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {[1, 2, 3, 4, 5, 6].map((i) => (
                     <div key={i} className="space-y-4">
-                        <div className="flex items-center justify-between">
-                            <div className="space-y-2">
+                        <div className="space-y-2">
+                            <div className="flex items-center justify-between">
                                 <Skeleton className="h-6 w-32" />
-                                <Skeleton className="h-4 w-96" />
+                                <Skeleton className="h-8 w-8" />
                             </div>
-                            <Skeleton className="h-8 w-24" />
+                            <Skeleton className="h-4 w-full" />
                         </div>
-                        <div className="relative">
-                            <div className="flex gap-4 overflow-x-auto pb-4 -mx-6 px-6">
-                                {[1, 2, 3, 4].map((j) => (
-                                    <Skeleton key={j} className="w-[300px] h-[280px] flex-none rounded-lg" />
-                                ))}
-                            </div>
-                        </div>
+                        <Skeleton className="w-full h-[200px] rounded-lg" />
                     </div>
                 ))}
             </div>

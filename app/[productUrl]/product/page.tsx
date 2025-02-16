@@ -64,7 +64,7 @@ export default function StepperDemo() {
                     <StepperTitle
                       className={cn(
                         instrumentSerif.className,
-                        "text-md font-medium truncate",
+                        "text-lg font-semibold truncate tracking-[0.025em]",
                       )}
                     >
                       {step.title}
