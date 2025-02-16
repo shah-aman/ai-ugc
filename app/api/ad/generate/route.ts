@@ -364,7 +364,7 @@ export async function POST(request: NextRequest) {
       .update({
         processed_video_link,
         // structured_script: scriptSegmentsWithTimestamps,
-        b_roll_used: brollVideos,
+        b_roll_used: brollVideoUrls,
       })
       .eq("id", scriptId);
 
