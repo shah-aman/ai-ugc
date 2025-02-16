@@ -1,128 +1,44 @@
 import { createContext, useContext, useMemo, useState } from "react";
+
 import { useParams } from "next/navigation";
 
-type VideoState = {
-  isPlaying: boolean;
-  isMuted: boolean;
-  progress: number;
-  currentScene: number;
-};
+import {
+  useProductInfo,
+  UseProductInfoQueryResult,
+} from "./modules/product-info";
+import {
+  useMarketResearch,
+  UseMarketResearchQueryResult,
+} from "./modules/market-research";
+import {
+  useStoryboard,
+  UseStoryboardQueryResult,
+} from "./modules/storyboarding";
+import {
+  useIntermediateVideo,
+  UseIntermediateVideoQueryResult,
+} from "./modules/intermediate-video";
+import { useFinalVideo, UseFinalVideoQueryResult } from "./modules/final-video";
+import { objectToMarkdownPromptRecursive } from "./modules/storyboarding/utils/prompt";
 
 export type ProductContextType = {
-  product: {
-    url: string;
-    name: string;
-    imageUrls: string[];
-    description: string;
-    price: string;
-    rating: number;
-    reviews: number;
-    category: string;
-    tags: string[];
-    specs: { label: string; value: string }[];
-    features: string[];
-    inStock: boolean;
-    targetAudiences: {
-      name: string;
-      description: string;
-    }[];
-  };
-  strategy: {
-    summary: string;
-    keyPoints: string[];
-    metrics: {
-      label: string;
-      value: string;
-      progress?: number;
-      status?: "success" | "warning";
-    }[];
-    influencers: {
-      name: string;
-      avatar: string;
-      followers: string;
-      engagement: string;
-      socialMedia: {
-        [key: string]: string;
-      };
-      tags: string[];
-    }[];
-  };
-  storyboard: {
-    scenes: {
-      id: number;
-      roll_type: "A-roll" | "B-roll";
-      content: string;
-      description: string;
-    }[];
-  };
-  intermediateVideo: {
-    videoState: VideoState;
-    setVideoState: (updates: Partial<VideoState>) => void;
-    handleSceneChange: (sceneIndex: number) => void;
-  };
-  finalVideo: {
-    details: {
-      title: string;
-      duration: string;
-      resolution: string;
-      format: string;
-      description: string;
-    };
-  };
-  setProduct: (product: ProductContextType["product"]) => void;
-  setStrategy: (strategy: ProductContextType["strategy"]) => void;
-  setStoryboard: (storyboard: ProductContextType["storyboard"]) => void;
-  setFinalVideo: (finalVideo: ProductContextType["finalVideo"]) => void;
+  product: UseProductInfoQueryResult;
+  marketResearch: UseMarketResearchQueryResult;
+  storyboard: UseStoryboardQueryResult;
+  intermediateVideo: UseIntermediateVideoQueryResult;
+  finalVideo: UseFinalVideoQueryResult;
+  // setProduct: (product: ProductContextType["product"]) => void;
+  // setStrategy: (strategy: ProductContextType["strategy"]) => void;
+  // setStoryboard: (storyboard: ProductContextType["storyboard"]) => void;
+  // setFinalVideo: (finalVideo: ProductContextType["finalVideo"]) => void;
 };
 
 const defaultContext: ProductContextType = {
-  product: {
-    url: "",
-    name: "",
-    imageUrls: [],
-    description: "",
-    price: "",
-    rating: 0,
-    reviews: 0,
-    category: "",
-    tags: [],
-    specs: [],
-    features: [],
-    inStock: false,
-    targetAudiences: [],
-  },
-  strategy: {
-    summary: "",
-    keyPoints: [],
-    metrics: [],
-    influencers: [],
-  },
-  storyboard: {
-    scenes: [],
-  },
-  intermediateVideo: {
-    videoState: {
-      isPlaying: false,
-      isMuted: false,
-      progress: 0,
-      currentScene: 0,
-    },
-    setVideoState: () => { },
-    handleSceneChange: () => { },
-  },
-  finalVideo: {
-    details: {
-      title: "",
-      duration: "",
-      resolution: "",
-      format: "",
-      description: "",
-    },
-  },
-  setProduct: () => { },
-  setStrategy: () => { },
-  setStoryboard: () => { },
-  setFinalVideo: () => { },
+  product: {} as UseProductInfoQueryResult,
+  marketResearch: {} as UseMarketResearchQueryResult,
+  storyboard: {} as UseStoryboardQueryResult,
+  intermediateVideo: {} as UseIntermediateVideoQueryResult,
+  finalVideo: {} as UseFinalVideoQueryResult,
 };
 
 export const ProductContext = createContext<ProductContextType>(defaultContext);
@@ -138,36 +54,54 @@ export function ProductContextProvider({
     [params],
   );
 
-  const [product, setProduct] = useState(defaultContext.product);
-  const [strategy, setStrategy] = useState(defaultContext.strategy);
-  const [storyboard, setStoryboard] = useState(defaultContext.storyboard);
-  const [finalVideo, setFinalVideo] = useState(defaultContext.finalVideo);
-  const [videoState, setVideoState] = useState(defaultContext.intermediateVideo.videoState);
+  const product = useProductInfo({ productUrl });
 
-  const handleSceneChange = (sceneIndex: number) => {
-    setVideoState(prev => ({
-      ...prev,
-      currentScene: sceneIndex,
-      isPlaying: false,
-      progress: 0,
-    }));
-  };
+  const marketResearch = useMarketResearch({
+    productDescription: product.data?.description ?? "",
+  });
+
+  const storyboard = useStoryboard({
+    customerIntent: "", // TODO: Add once done
+    productResearch:
+      marketResearch.data !== undefined
+        ? objectToMarkdownPromptRecursive(marketResearch.data!)
+        : "", // TODO: Consider passing an object instead of markdown
+    influencerResearch: "", // TODO: Add once done
+  });
+
+  const intermediateVideo = useIntermediateVideo({
+    avatarId: "113eece852cd4d0eb70cfdfa612dd04b",
+    voiceId: "26b2064088674c80b1e5fc5ab1a068eb",
+    script:
+      storyboard.data?.script
+        .map(
+          (scene) =>
+            `Roll type: ${scene.roll_type}\nDescription: ${scene.description}\nContent: "${scene.content}"`,
+        )
+        .join("\n\n") ?? "", // TODO: Improve the data being passed
+  });
+
+  const finalVideo = useFinalVideo({
+    avatarId: "",
+    voiceId: "",
+    script: "",
+  });
+
+  // const handleSceneChange = (sceneIndex: number) => {
+  //   setVideoState((prev) => ({
+  //     ...prev,
+  //     currentScene: sceneIndex,
+  //     isPlaying: false,
+  //     progress: 0,
+  //   }));
+  // };
 
   const contextValue = {
-    product: { ...product, url: productUrl },
-    strategy,
+    product,
+    marketResearch,
     storyboard,
-    intermediateVideo: {
-      videoState,
-      setVideoState: (updates: Partial<VideoState>) =>
-        setVideoState(prev => ({ ...prev, ...updates })),
-      handleSceneChange,
-    },
+    intermediateVideo,
     finalVideo,
-    setProduct,
-    setStrategy,
-    setStoryboard,
-    setFinalVideo,
   };
 
   return (

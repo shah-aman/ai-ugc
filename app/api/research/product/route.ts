@@ -3,18 +3,20 @@ import { researchProduct } from "./services";
 import { getSupabase } from "@/supabase/utils";
 export async function POST(request: NextRequest) {
   try {
-    const { product_link, product_description } = await request.json();
+    const {
+      product_link: productLink,
+      product_description: productDescription,
+    } = await request.json();
 
-    if (!product_description) {
+    if (!productDescription) {
       return NextResponse.json(
         { error: "Product description is required" },
         { status: 400 },
       );
     }
 
-    const { summary, citations, error } = await researchProduct(
-      product_description,
-    );
+    const { summary, citations, error } =
+      await researchProduct(productDescription);
 
     if (error) {
       return NextResponse.json(
@@ -27,7 +29,7 @@ export async function POST(request: NextRequest) {
     const { error: updateError } = await supabase
       .from("research")
       .insert({
-        product_link,
+        product_link: productLink,
         product_research: {
           summary,
           citations,

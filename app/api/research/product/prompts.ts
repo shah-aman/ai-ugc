@@ -6,8 +6,8 @@ interface ResearchArea {
 
 const researchAreas: ResearchArea[] = [
   {
-    name: 'keyFeatures',
-    description: 'Key Features & Technical Specifications',
+    name: "keyFeatures",
+    description: "Key Features & Technical Specifications",
     prompt: `Analyze the product's key features and technical specifications in detail.
 Focus on:
 1. Core functionality and capabilities
@@ -25,11 +25,11 @@ Format your response as JSON:
   "specifications": { [key: string]: string | number },
   "innovations": string[],
   "buildQuality": { "materials": string[], "durability": string }
-}`
+}`,
   },
   {
-    name: 'marketAnalysis',
-    description: 'Target Market & Use Cases',
+    name: "marketAnalysis",
+    description: "Target Market & Use Cases",
     prompt: `Conduct a deep analysis of the target market and use cases.
 Focus on:
 1. Primary target demographics
@@ -55,11 +55,11 @@ Format your response as JSON:
   "useCases": [
     { "scenario": string, "benefits": string[] }
   ]
-}`
+}`,
   },
   {
-    name: 'competitiveAnalysis',
-    description: 'Competitor Analysis & Market Position',
+    name: "competitiveAnalysis",
+    description: "Competitor Analysis & Market Position",
     prompt: `Perform a detailed competitive analysis.
 Focus on:
 1. Direct competitors
@@ -91,11 +91,11 @@ Format your response as JSON:
     "challenges": string[],
     "opportunities": string[]
   }
-}`
+}`,
   },
   {
-    name: 'painPoints',
-    description: 'Pain Points & Solutions',
+    name: "painPoints",
+    description: "Pain Points & Solutions",
     prompt: `Analyze customer pain points and how the product addresses them.
 Focus on:
 1. Common customer problems
@@ -103,6 +103,8 @@ Focus on:
 3. Customer satisfaction metrics
 4. Areas for improvement
 5. User feedback analysis
+
+The satisfaction metrics are all numbers out of 5.
 
 Format your response as JSON:
 {
@@ -115,14 +117,14 @@ Format your response as JSON:
     }
   ],
   "satisfactionMetrics": {
-    "overallRating": string,
-    "keyMetrics": { [key: string]: string }
+    "overallRating": number,
+    "keyMetrics": { [key: string]: number }
   },
   "improvementAreas": [
     { "area": string, "suggestion": string }
   ]
-}`
-  }
+}`,
+  },
 ];
 
 const consolidationPrompt = `
