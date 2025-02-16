@@ -3,10 +3,7 @@ import { researchProduct } from "./services";
 import { getSupabase } from "@/supabase/utils";
 export async function POST(request: NextRequest) {
   try {
-    const {
-      product_link: productLink,
-      product_description: productDescription,
-    } = await request.json();
+    const { productLink, productDescription } = await request.json();
 
     if (!productDescription) {
       return NextResponse.json(
