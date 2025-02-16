@@ -27,7 +27,7 @@ export default function StepperDemo() {
     { id: "market-strategy", title: "Market Strategy" },
     { id: "influencers", title: "Influencers" },
     { id: "storyboard", title: "Storyboard" },
-    { id: "raw-video", title: "Raw Video" },
+    // { id: "raw-video", title: "Raw Video" },
     { id: "final-video", title: "Final Video" },
   );
 
@@ -112,7 +112,7 @@ export default function StepperDemo() {
                   <InfluencersView onNextStep={methods.next} />
                 ),
                 storyboard: () => <StoryboardView onNextStep={methods.next} />,
-                "raw-video": () => <IntermediateVideoView />,
+                // "raw-video": () => <IntermediateVideoView />,
                 "final-video": () => <FinalVideoView />,
               })}
             </StepperPanel>

@@ -15,7 +15,7 @@ if (!process.env.HEYGEN_API_KEY) {
   throw new Error("HEYGEN_API_KEY is not set");
 }
 
-type RequestBody = {
+export type RequestBody = {
   scriptId: string;
   zapcapTemplateId: string;
 };
@@ -35,10 +35,7 @@ export async function POST(request: NextRequest) {
 
     if (scriptError) {
       console.error("Failed to fetch script:", scriptError);
-      return NextResponse.json(
-        { error: scriptError.message },
-        { status: 500 },
-      );
+      return NextResponse.json({ error: scriptError.message }, { status: 500 });
     }
 
     console.log("Fetching influencer data...");
@@ -58,9 +55,12 @@ export async function POST(request: NextRequest) {
 
     if (!influencerData) {
       console.error("Influencer not found for ID:", scriptRow.influencer_id);
-      return NextResponse.json({ error: "Influencer not found" }, {
-        status: 404,
-      });
+      return NextResponse.json(
+        { error: "Influencer not found" },
+        {
+          status: 404,
+        },
+      );
     }
 
     console.log("Influencer data retrieved:", {
@@ -80,29 +80,39 @@ export async function POST(request: NextRequest) {
 
     if (avatarError) {
       console.error("Failed to fetch avatar:", avatarError);
-      return NextResponse.json({ error: avatarError.message }, {
-        status: 500,
-      });
+      return NextResponse.json(
+        { error: avatarError.message },
+        {
+          status: 500,
+        },
+      );
     }
 
-    const voice_id = avatarData.gender === "male"
-      ? "26b2064088674c80b1e5fc5ab1a068ec"
-      : "26b2064088674c80b1e5fc5ab1a068eb";
+    const voice_id =
+      avatarData.gender === "male"
+        ? "26b2064088674c80b1e5fc5ab1a068ec"
+        : "26b2064088674c80b1e5fc5ab1a068eb";
 
     const { full_script, structured_script, product_link } = scriptRow;
 
     if (!full_script) {
       console.error("Script is missing for ID:", scriptId);
-      return NextResponse.json({ error: "Script is missing" }, {
-        status: 400,
-      });
+      return NextResponse.json(
+        { error: "Script is missing" },
+        {
+          status: 400,
+        },
+      );
     }
 
     if (!structured_script) {
       console.error("Structured script is missing for ID:", scriptId);
-      return NextResponse.json({ error: "Structured script is missing" }, {
-        status: 400,
-      });
+      return NextResponse.json(
+        { error: "Structured script is missing" },
+        {
+          status: 400,
+        },
+      );
     }
 
     console.log("Fetching research data...");
@@ -114,22 +124,25 @@ export async function POST(request: NextRequest) {
 
     if (researchError) {
       console.error("Failed to fetch research:", researchError);
-      return NextResponse.json({ error: researchError.message }, {
-        status: 500,
-      });
+      return NextResponse.json(
+        { error: researchError.message },
+        {
+          status: 500,
+        },
+      );
     }
 
-    console.log(
-      "Research data retrieved for product:",
-      product_link,
-    );
+    console.log("Research data retrieved for product:", product_link);
 
     const { top3ImageUrls } = researchData.product_info;
     if (!top3ImageUrls || top3ImageUrls.length === 0) {
       console.error("No image URLs found in research data");
-      return NextResponse.json({ error: "No image urls found" }, {
-        status: 400,
-      });
+      return NextResponse.json(
+        { error: "No image urls found" },
+        {
+          status: 400,
+        },
+      );
     }
 
     const image_url: string = top3ImageUrls[0];
@@ -138,9 +151,12 @@ export async function POST(request: NextRequest) {
 
     if (!avatar_id || !voice_id) {
       console.error("Missing avatar or voice ID:", { avatar_id, voice_id });
-      return NextResponse.json({
-        error: "Influencer avatar_id or voice_id is missing",
-      }, { status: 400 });
+      return NextResponse.json(
+        {
+          error: "Influencer avatar_id or voice_id is missing",
+        },
+        { status: 400 },
+      );
     }
 
     console.log("Generating main video with HeyGen...");
@@ -152,17 +168,19 @@ export async function POST(request: NextRequest) {
     const videoId = generateResponse.data.video_id;
     if (!videoId) {
       console.error("No video ID returned from HeyGen");
-      return NextResponse.json({ error: "Failed to generate video" }, {
-        status: 500,
-      });
+      return NextResponse.json(
+        { error: "Failed to generate video" },
+        {
+          status: 500,
+        },
+      );
     }
     console.log("Starting parallel video processing...", videoId);
     const [videoObj, brollVideos] = await Promise.all([
       pollVideoStatus(videoId, true, 1000 * 60 * 5),
-      generateBRollVideos(
-        image_url,
-        { script: structured_script } as ExtractStructuredScriptSchema,
-      ),
+      generateBRollVideos(image_url, {
+        script: structured_script,
+      } as ExtractStructuredScriptSchema),
     ]);
 
     console.log("Video generation complete:", {
@@ -174,9 +192,12 @@ export async function POST(request: NextRequest) {
 
     if (!videoUrl) {
       console.error("No video URL returned from HeyGen");
-      return NextResponse.json({ error: "Failed to generate video" }, {
-        status: 500,
-      });
+      return NextResponse.json(
+        { error: "Failed to generate video" },
+        {
+          status: 500,
+        },
+      );
     }
 
     console.log("Uploading B-roll videos to storage...");
@@ -204,13 +225,11 @@ export async function POST(request: NextRequest) {
 
         console.log("Storing B-roll metadata in database...");
         // Store in database
-        const { error: dbError } = await supabase
-          .from("b_roll")
-          .insert({
-            product_link,
-            description: video.description,
-            video_link: urlData.publicUrl,
-          });
+        const { error: dbError } = await supabase.from("b_roll").insert({
+          product_link,
+          description: video.description,
+          video_link: urlData.publicUrl,
+        });
 
         if (dbError) {
           console.error("Failed to store B-roll data:", dbError);
@@ -295,10 +314,7 @@ export async function POST(request: NextRequest) {
 
     console.log("Generating captions with Zapcap...");
     const { videoBuffer: captionedVideoBuffer, error: zapcapError } =
-      await generateZapcap(
-        processed_video_link,
-        zapcapTemplateId,
-      );
+      await generateZapcap(processed_video_link, zapcapTemplateId);
 
     if (zapcapError || !captionedVideoBuffer) {
       console.error("Failed to generate captions:", zapcapError);
@@ -364,8 +380,11 @@ export async function POST(request: NextRequest) {
         { status: error.status },
       );
     }
-    return NextResponse.json({ error: "Failed to generate video" }, {
-      status: 500,
-    });
+    return NextResponse.json(
+      { error: "Failed to generate video" },
+      {
+        status: 500,
+      },
+    );
   }
 }

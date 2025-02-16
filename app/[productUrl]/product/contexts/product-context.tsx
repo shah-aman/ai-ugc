@@ -14,10 +14,10 @@ import {
   useStoryboard,
   UseStoryboardQueryResult,
 } from "./modules/storyboarding";
-import {
-  useIntermediateVideo,
-  UseIntermediateVideoQueryResult,
-} from "./modules/intermediate-video";
+// import {
+//   useIntermediateVideo,
+//   UseIntermediateVideoQueryResult,
+// } from "./modules/intermediate-video";
 import { useFinalVideo, UseFinalVideoQueryResult } from "./modules/final-video";
 import { objectToMarkdownPromptRecursive } from "./modules/storyboarding/utils/prompt";
 import {
@@ -33,7 +33,7 @@ export type ProductContextType = {
   storyboard: UseStoryboardQueryResult;
   selectedInfluencerId: string;
   setSelectedInfluencerId: (id: string) => void;
-  intermediateVideo: UseIntermediateVideoQueryResult;
+  // intermediateVideo: UseIntermediateVideoQueryResult;
   finalVideo: UseFinalVideoQueryResult;
   // setProduct: (product: ProductContextType["product"]) => void;
   // setStrategy: (strategy: ProductContextType["strategy"]) => void;
@@ -48,7 +48,7 @@ const defaultContext: ProductContextType = {
   storyboard: {} as UseStoryboardQueryResult,
   selectedInfluencerId: "",
   setSelectedInfluencerId: () => undefined,
-  intermediateVideo: {} as UseIntermediateVideoQueryResult,
+  // intermediateVideo: {} as UseIntermediateVideoQueryResult,
   finalVideo: {} as UseFinalVideoQueryResult,
 };
 
@@ -79,6 +79,13 @@ export function ProductContextProvider({
 
   const influencerResearch = useInfluencerResearch();
 
+  const [selectedInfluencerId, setSelectedInfluencerId] = useState<string>();
+  // const selectedInfluencer = useMemo(
+  //   () =>
+  //     influencerResearch.data?.find(({ id }) => id === selectedInfluencerId),
+  //   [influencerResearch, selectedInfluencerId],
+  // );
+
   const storyboard = useStoryboard({
     customerIntent: "", // TODO: Add once done
     productResearch:
@@ -87,34 +94,27 @@ export function ProductContextProvider({
         : "", // TODO: Consider passing an object instead of markdown
     influencerResearch: "", // TODO: Add once done
     productLink: productUrl,
-    influencerId: "54e6c27f-c6dd-4ba0-9b69-823771ed49cd",
+    influencerId: selectedInfluencerId ?? "",
   });
 
-  const [selectedInfluencerId, setSelectedInfluencerId] = useState<string>();
-  const selectedInfluencer = useMemo(
-    () =>
-      influencerResearch.data?.find(({ id }) => id === selectedInfluencerId),
-    [influencerResearch, selectedInfluencerId],
-  );
-  const intermediateVideo = useIntermediateVideo({
-    avatarId: selectedInfluencer?.avatar_id ?? "",
-    voiceId: selectedInfluencer?.voice_id ?? "26b2064088674c80b1e5fc5ab1a068eb",
-    script:
-      (
-        storyboard.data
-          ?.structured_script as ExtractStructuredScriptSchema["script"]
-      )
-        ?.map(
-          (scene) =>
-            `Roll type: ${scene!.roll_type}\nDescription: ${scene!.description}\nContent: "${scene!.content}"`,
-        )
-        .join("\n\n") ?? "", // TODO: Improve the data being passed
-  });
+  // const intermediateVideo = useIntermediateVideo({
+  //   avatarId: selectedInfluencer?.avatar_id ?? "",
+  //   voiceId: selectedInfluencer?.voice_id ?? "26b2064088674c80b1e5fc5ab1a068eb",
+  //   script:
+  //     (
+  //       storyboard.data
+  //         ?.structured_script as ExtractStructuredScriptSchema["script"]
+  //     )
+  //       ?.map(
+  //         (scene) =>
+  //           `Roll type: ${scene!.roll_type}\nDescription: ${scene!.description}\nContent: "${scene!.content}"`,
+  //       )
+  //       .join("\n\n") ?? "", // TODO: Improve the data being passed
+  // });
 
   const finalVideo = useFinalVideo({
-    avatarId: "",
-    voiceId: "",
-    script: "",
+    scriptId: storyboard.data?.id ?? "",
+    zapcapTemplateId: "",
   });
 
   // const handleSceneChange = (sceneIndex: number) => {
@@ -133,7 +133,7 @@ export function ProductContextProvider({
     storyboard,
     selectedInfluencerId,
     setSelectedInfluencerId,
-    intermediateVideo,
+    // intermediateVideo,
     finalVideo,
   };
 
