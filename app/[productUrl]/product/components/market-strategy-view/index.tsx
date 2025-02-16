@@ -1,44 +1,22 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 import { Users, Target, Crosshair } from "lucide-react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { ConsolidatedResearch } from "@/app/api/research/product/types";
+import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 import { useProductContext } from "../../contexts/product-context";
-import { Skeleton } from "@/components/ui/skeleton";
+import { SourceIcon } from "./components/source-icon";
 
-export type SourceIconProps = {
-  domain: string;
-  name: string;
+export type MarketStrategyViewProps = {
+  onNextStep: () => void;
 };
 
-function SourceIcon({ domain, name }: SourceIconProps) {
-  const [useFallback, setUseFallback] = useState(false);
-
-  if (useFallback) {
-    return (
-      <img
-        src="/placeholder-favicon.png"
-        alt={`${name} Icon`}
-        className="rounded-full w-4 h-4"
-      />
-    );
-  }
-
-  return (
-    <img
-      src={`https://${domain}/favicon.ico`}
-      alt={`${name} Icon`}
-      className="rounded-full w-4 h-4"
-      onError={() => setUseFallback(true)}
-    />
-  );
-}
-
-export function MarketStrategyView() {
+export function MarketStrategyView({ onNextStep }: MarketStrategyViewProps) {
   const {
     marketResearch: { refetch, data },
   } = useProductContext();
@@ -192,9 +170,10 @@ export function MarketStrategyView() {
                     key={i}
                     className="flex items-center gap-2 shrink-0 border bg-muted/50 px-3 py-1.5 rounded-sm hover:bg-muted/70 transition-colors"
                   >
-                    <div className="relative h-4 w-4 flex-none">
-                      <SourceIcon domain={domain} name={name} />
-                    </div>
+                    {/* <div className="relative h-4 w-4 flex-none"> */}
+                    {/*   <SourceIcon domain={domain} name={name} /> */}
+                    {/* </div> */}
+                    <SourceIcon domain={domain} name={name} />
                     <span className="text-xs text-muted-foreground whitespace-nowrap">
                       {name}
                     </span>
@@ -573,6 +552,19 @@ export function MarketStrategyView() {
             </TabsContent>
           </Tabs>
         </>
+      )}
+
+      {data !== undefined && (
+        <Button
+          onClick={onNextStep}
+          className={cn(
+            "w-full bg-fuchsia-500 text-white",
+            "hover:bg-fuchsia-600",
+            "focus-visible:ring-2 focus-visible:ring-sidebar-ring focus-visible:outline-none",
+          )}
+        >
+          Explore influencers
+        </Button>
       )}
     </div>
   );
