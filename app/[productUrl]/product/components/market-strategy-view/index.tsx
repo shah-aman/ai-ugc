@@ -1,14 +1,15 @@
 import { useEffect } from "react";
+
 import { Users, Target, Crosshair } from "lucide-react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-
-import { useProductContext } from "../../contexts/product-context";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+
+import { useProductContext } from "../../contexts/product-context";
 import { SourceIcon } from "./components/source-icon";
 
 export type MarketStrategyViewProps = {
@@ -17,8 +18,12 @@ export type MarketStrategyViewProps = {
 
 export function MarketStrategyView({ onNextStep }: MarketStrategyViewProps) {
   const {
-    productResearch: { data },
+    marketResearch: { refetch, data },
   } = useProductContext();
+
+  useEffect(() => {
+    refetch();
+  }, [refetch]);
 
   return (
     <div className="space-y-6 w-full">
@@ -38,8 +43,8 @@ export function MarketStrategyView({ onNextStep }: MarketStrategyViewProps) {
                 <CardContent className="pt-0 pb-2 px-2">
                   <div className="text-base font-medium">
                     {
-                      data.summary.detailedAnalysis.market.primaryMarket
-                        .marketSize
+                      data.productResearch.summary.detailedAnalysis.market
+                        .primaryMarket.marketSize
                     }
                   </div>
                 </CardContent>
@@ -54,7 +59,10 @@ export function MarketStrategyView({ onNextStep }: MarketStrategyViewProps) {
                 </CardHeader>
                 <CardContent className="pt-0 pb-2 px-2">
                   <div className="text-base font-medium">
-                    {data.summary.detailedAnalysis.market.userPersonas.length}
+                    {
+                      data.productResearch.summary.detailedAnalysis.market
+                        .userPersonas.length
+                    }
                   </div>
                 </CardContent>
               </Card>
@@ -69,7 +77,7 @@ export function MarketStrategyView({ onNextStep }: MarketStrategyViewProps) {
                 <CardContent className="pt-0 pb-2 px-2">
                   <div className="text-base font-medium">
                     {
-                      data.summary.detailedAnalysis.competition
+                      data.productResearch.summary.detailedAnalysis.competition
                         .directCompetitors.length
                     }
                   </div>
@@ -86,7 +94,7 @@ export function MarketStrategyView({ onNextStep }: MarketStrategyViewProps) {
                   </span>
                   <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500 text-center">
                     {
-                      data.summary.detailedAnalysis.painPoints
+                      data.productResearch.summary.detailedAnalysis.painPoints
                         .satisfactionMetrics.overallRating
                     }
                   </span>
@@ -94,8 +102,8 @@ export function MarketStrategyView({ onNextStep }: MarketStrategyViewProps) {
               </div>
 
               {Object.entries(
-                data.summary.detailedAnalysis.painPoints.satisfactionMetrics
-                  .keyMetrics,
+                data.productResearch.summary.detailedAnalysis.painPoints
+                  .satisfactionMetrics.keyMetrics,
               ).map(([key, value], index) => {
                 const colors = {
                   0: {
@@ -146,12 +154,12 @@ export function MarketStrategyView({ onNextStep }: MarketStrategyViewProps) {
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-medium">Research Sources</h3>
               <span className="text-xs text-muted-foreground">
-                {data.citations.length} sources
+                {data.productResearch.citations.length} sources
               </span>
             </div>
 
             <div className="flex flex-wrap gap-2">
-              {data.citations.map((citation, i) => {
+              {data.productResearch.citations.map((citation, i) => {
                 const urlMatch = citation.match(/https?:\/\/([^\/]+)/);
                 const domain = urlMatch ? urlMatch[1] : "";
                 const nameMatch = citation.match(/^(.*?)\s*-\s*http/);
@@ -216,12 +224,12 @@ export function MarketStrategyView({ onNextStep }: MarketStrategyViewProps) {
                 {/* Market Overview */}
                 <div className="space-y-2">
                   <p className="text-sm text-muted-foreground">
-                    {data.summary.productSummary.overview}
+                    {data.productResearch.summary.productSummary.overview}
                   </p>
                   <div className="mt-4">
                     <h4 className="text-xs font-medium mb-2">Key Insights</h4>
                     <div className="space-y-2">
-                      {data.summary.productSummary.keyInsights.map(
+                      {data.productResearch.summary.productSummary.keyInsights.map(
                         (insight, index) => (
                           <p
                             key={index}
@@ -239,7 +247,7 @@ export function MarketStrategyView({ onNextStep }: MarketStrategyViewProps) {
                 <div className="space-y-3">
                   <h3 className="text-sm font-medium">Secondary Markets</h3>
                   <div className="grid gap-2">
-                    {data.summary.detailedAnalysis.market.secondaryMarkets.map(
+                    {data.productResearch.summary.detailedAnalysis.market.secondaryMarkets.map(
                       (market, index) => (
                         <div
                           key={index}
@@ -261,7 +269,7 @@ export function MarketStrategyView({ onNextStep }: MarketStrategyViewProps) {
                 <div className="space-y-3">
                   <h3 className="text-sm font-medium">Use Cases</h3>
                   <div className="grid gap-2">
-                    {data.summary.detailedAnalysis.market.useCases.map(
+                    {data.productResearch.summary.detailedAnalysis.market.useCases.map(
                       (useCase, index) => (
                         <div
                           key={index}
@@ -295,14 +303,14 @@ export function MarketStrategyView({ onNextStep }: MarketStrategyViewProps) {
                   <h3 className="text-xs font-medium">Primary Market</h3>
                   <Badge variant="outline" className="text-[10px]">
                     {
-                      data.summary.detailedAnalysis.market.primaryMarket
-                        .marketSize
+                      data.productResearch.summary.detailedAnalysis.market
+                        .primaryMarket.marketSize
                     }
                   </Badge>
                 </div>
                 <div className="space-y-2">
                   <div className="flex flex-wrap gap-1.5">
-                    {data.summary.detailedAnalysis.market.primaryMarket.demographics.map(
+                    {data.productResearch.summary.detailedAnalysis.market.primaryMarket.demographics.map(
                       (demo, i) => (
                         <Badge
                           key={i}
@@ -315,7 +323,7 @@ export function MarketStrategyView({ onNextStep }: MarketStrategyViewProps) {
                     )}
                   </div>
                   <div className="flex flex-wrap gap-1.5">
-                    {data.summary.detailedAnalysis.market.primaryMarket.psychographics.map(
+                    {data.productResearch.summary.detailedAnalysis.market.primaryMarket.psychographics.map(
                       (psycho, i) => (
                         <Badge
                           key={i}
@@ -332,7 +340,7 @@ export function MarketStrategyView({ onNextStep }: MarketStrategyViewProps) {
 
               {/* Secondary Markets */}
               <div className="space-y-2">
-                {data.summary.detailedAnalysis.market.secondaryMarkets.map(
+                {data.productResearch.summary.detailedAnalysis.market.secondaryMarkets.map(
                   (market, index) => (
                     <div
                       key={index}
@@ -356,7 +364,7 @@ export function MarketStrategyView({ onNextStep }: MarketStrategyViewProps) {
 
               {/* User Personas */}
               <div className="grid gap-2">
-                {data.summary.detailedAnalysis.market.userPersonas.map(
+                {data.productResearch.summary.detailedAnalysis.market.userPersonas.map(
                   (persona, index) => (
                     <div
                       key={index}
@@ -397,7 +405,7 @@ export function MarketStrategyView({ onNextStep }: MarketStrategyViewProps) {
                       Advantages
                     </h4>
                     <div className="flex flex-col gap-1.5">
-                      {data.summary.detailedAnalysis.competition.marketPosition.uniqueAdvantages.map(
+                      {data.productResearch.summary.detailedAnalysis.competition.marketPosition.uniqueAdvantages.map(
                         (advantage, i) => (
                           <span
                             key={i}
@@ -414,7 +422,7 @@ export function MarketStrategyView({ onNextStep }: MarketStrategyViewProps) {
                       Challenges
                     </h4>
                     <div className="flex flex-col gap-1.5">
-                      {data.summary.detailedAnalysis.competition.marketPosition.challenges.map(
+                      {data.productResearch.summary.detailedAnalysis.competition.marketPosition.challenges.map(
                         (challenge, i) => (
                           <span
                             key={i}
@@ -431,7 +439,7 @@ export function MarketStrategyView({ onNextStep }: MarketStrategyViewProps) {
                       Opportunities
                     </h4>
                     <div className="flex flex-col gap-1.5">
-                      {data.summary.detailedAnalysis.competition.marketPosition.opportunities.map(
+                      {data.productResearch.summary.detailedAnalysis.competition.marketPosition.opportunities.map(
                         (opportunity, i) => (
                           <span
                             key={i}
@@ -448,7 +456,7 @@ export function MarketStrategyView({ onNextStep }: MarketStrategyViewProps) {
 
               {/* Direct Competitors */}
               <div className="space-y-2">
-                {data.summary.detailedAnalysis.competition.directCompetitors.map(
+                {data.productResearch.summary.detailedAnalysis.competition.directCompetitors.map(
                   (competitor, index) => (
                     <div
                       key={index}
@@ -507,7 +515,7 @@ export function MarketStrategyView({ onNextStep }: MarketStrategyViewProps) {
 
               {/* Indirect Competitors */}
               <div className="space-y-2">
-                {data.summary.detailedAnalysis.competition.indirectCompetitors.map(
+                {data.productResearch.summary.detailedAnalysis.competition.indirectCompetitors.map(
                   (competitor, index) => (
                     <div
                       key={index}

@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useContext, useMemo, useState } from "react";
 
 import { useParams } from "next/navigation";
 
@@ -7,9 +7,9 @@ import {
   UseProductInfoQueryResult,
 } from "./modules/product-info";
 import {
-  useProductResearch,
-  UseProductResearchQueryResult,
-} from "./modules/product-research";
+  useMarketResearch,
+  UseMarketResearchQueryResult,
+} from "./modules/market-research";
 import {
   useStoryboard,
   UseStoryboardQueryResult,
@@ -20,18 +20,13 @@ import {
 } from "./modules/intermediate-video";
 import { useFinalVideo, UseFinalVideoQueryResult } from "./modules/final-video";
 import { objectToMarkdownPromptRecursive } from "./modules/storyboarding/utils/prompt";
-import {
-  useInfluencerResearch,
-  UseInfluencerResearchQueryResult,
-} from "./modules/influencer-research";
 
 export type ProductContextType = {
   product: UseProductInfoQueryResult;
-  productResearch: UseProductResearchQueryResult;
-  influencerResearch: UseInfluencerResearchQueryResult;
+  marketResearch: UseMarketResearchQueryResult;
   storyboard: UseStoryboardQueryResult;
-  selectedInfluencerId: string;
-  setSelectedInfluencerId: (id: string) => void;
+  avatarId: string;
+  setAvatarId: (id: string) => void;
   intermediateVideo: UseIntermediateVideoQueryResult;
   finalVideo: UseFinalVideoQueryResult;
   // setProduct: (product: ProductContextType["product"]) => void;
@@ -42,11 +37,10 @@ export type ProductContextType = {
 
 const defaultContext: ProductContextType = {
   product: {} as UseProductInfoQueryResult,
-  productResearch: {} as UseProductResearchQueryResult,
-  influencerResearch: {} as UseInfluencerResearchQueryResult,
+  marketResearch: {} as UseMarketResearchQueryResult,
   storyboard: {} as UseStoryboardQueryResult,
-  selectedInfluencerId: "",
-  setSelectedInfluencerId: () => undefined,
+  avatarId: "",
+  setAvatarId: () => undefined,
   intermediateVideo: {} as UseIntermediateVideoQueryResult,
   finalVideo: {} as UseFinalVideoQueryResult,
 };
@@ -66,38 +60,27 @@ export function ProductContextProvider({
 
   const product = useProductInfo({ productUrl });
 
-  const productResearch = useProductResearch({
+  const marketResearch = useMarketResearch({
     productDescription: product.data?.description ?? "",
-    productLink: productUrl,
   });
-  useEffect(() => {
-    if (product.data?.description !== undefined) {
-      productResearch.refetch();
-    }
-  }, [productResearch, product]);
-
-  const influencerResearch = useInfluencerResearch();
 
   const storyboard = useStoryboard({
     customerIntent: "", // TODO: Add once done
     productResearch:
-      productResearch.data !== undefined
-        ? objectToMarkdownPromptRecursive(productResearch.data!)
+      marketResearch.data !== undefined
+        ? objectToMarkdownPromptRecursive(marketResearch.data!)
         : "", // TODO: Consider passing an object instead of markdown
     influencerResearch: "", // TODO: Add once done
     productLink: productUrl,
     influencerId: "54e6c27f-c6dd-4ba0-9b69-823771ed49cd",
   });
 
-  const [selectedInfluencerId, setSelectedInfluencerId] = useState<string>();
-  const selectedInfluencer = useMemo(
-    () =>
-      influencerResearch.data?.find(({ id }) => id === selectedInfluencerId),
-    [influencerResearch, selectedInfluencerId],
-  );
+  console.log(storyboard.data);
+
+  const [avatarId, setAvatarId] = useState<string>();
   const intermediateVideo = useIntermediateVideo({
-    avatarId: selectedInfluencer?.avatar_id ?? "",
-    voiceId: selectedInfluencer?.voice_id ?? "26b2064088674c80b1e5fc5ab1a068eb",
+    avatarId: avatarId ?? "",
+    voiceId: "26b2064088674c80b1e5fc5ab1a068eb",
     script:
       storyboard.data?.structured_script
         ?.map(
@@ -124,11 +107,10 @@ export function ProductContextProvider({
 
   const contextValue = {
     product,
-    productResearch,
-    influencerResearch,
+    marketResearch,
     storyboard,
-    selectedInfluencerId,
-    setSelectedInfluencerId,
+    avatarId,
+    setAvatarId,
     intermediateVideo,
     finalVideo,
   };

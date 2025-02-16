@@ -1,24 +1,14 @@
 import { researchAreas } from "./prompts";
 import {
+  ResearchDataSchema,
   ConsolidatedDataSchema,
   ResearchResult,
   ConsolidatedResearch,
   ResearchData,
-  KeyFeaturesDataSchema,
-  MarketAnalysisDataSchema,
-  CompetitiveAnalysisDataSchema,
-  PainPointsDataSchema,
 } from "./types";
-import OpenAI from 'openai';
-import { zodResponseFormat } from 'openai/helpers/zod';
-import { z } from 'zod';
 
 const PERPLEXITY_API_KEY = process.env.PERPLEXITY_API_KEY;
 const PERPLEXITY_API_URL = "https://api.perplexity.ai/chat/completions";
-
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
 
 function cleanJsonResponse(content: string): string {
   const jsonMatch = content.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
@@ -26,22 +16,6 @@ function cleanJsonResponse(content: string): string {
     return jsonMatch[1].trim();
   }
   return content.trim();
-}
-
-async function extractStructuredData<T extends z.ZodTypeAny>(
-  schema: T,
-  text: string
-): Promise<z.infer<T>> {
-  const completion = await openai.beta.chat.completions.parse({
-    model: "gpt-4o-mini",
-    messages: [
-      { role: "system", content: "Extract structured data based on the schema." },
-      { role: "user", content: text },
-    ],
-    response_format: zodResponseFormat(schema, "structured_data"),
-  });
-
-  return completion.choices[0].message.parsed;
 }
 
 async function performSpecializedResearch(
@@ -79,26 +53,27 @@ IMPORTANT FORMATTING RULES:
       }),
     });
 
-    const perplexityData = await response.json();
-    const cleanedContent = cleanJsonResponse(perplexityData.choices[0].message.content);
+    const data = await response.json();
+    console.log(data);
+    try {
+      const cleanedContent = cleanJsonResponse(data.choices[0].message.content);
+      const parsedData = JSON.parse(cleanedContent);
 
-    const validatedData = await extractStructuredData(
-      area.name === "keyFeatures" ? KeyFeaturesDataSchema :
-      area.name === "marketAnalysis" ? MarketAnalysisDataSchema :
-      area.name === "competitiveAnalysis" ? CompetitiveAnalysisDataSchema :
-      PainPointsDataSchema,
-      cleanedContent
-    );
-
-    return {
-      data: {
+      const validatedData = ResearchDataSchema.parse({
         type: area.name,
+        data: parsedData,
+      } as const);
+
+      return {
         data: validatedData,
-      },
-      citations: perplexityData.citations || [],
-    };
+        citations: data.citations || [],
+      };
+    } catch (parseError) {
+      console.log(data);
+      console.error("Data validation error:", String(parseError));
+      throw new Error("Invalid or malformed research data");
+    }
   } catch (error) {
-    console.error("Research error:", error);
     throw error;
   }
 }
@@ -251,7 +226,6 @@ export async function researchProduct(
     };
   }
 }
-
 type KeyFeaturesResearch = Extract<ResearchData, { type: "keyFeatures" }>;
 type MarketAnalysisResearch = Extract<ResearchData, { type: "marketAnalysis" }>;
 type CompetitiveAnalysisResearch = Extract<

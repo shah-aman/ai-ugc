@@ -61,7 +61,7 @@ export const PainPointSchema = z.object({
 
 export const SatisfactionMetricsSchema = z.object({
   overallRating: z.number(),
-  keyMetrics: z.object({}).catchall(z.number()),
+  keyMetrics: z.record(z.number()),
 });
 
 export const ImprovementAreaSchema = z.object({
@@ -71,7 +71,7 @@ export const ImprovementAreaSchema = z.object({
 
 export const KeyFeaturesDataSchema = z.object({
   features: z.array(FeatureSchema),
-  specifications: z.object({}).catchall(z.union([z.string(), z.number()])),
+  specifications: z.record(z.union([z.string(), z.number()])),
   innovations: z.array(z.string()),
   buildQuality: BuildQualitySchema,
 });
