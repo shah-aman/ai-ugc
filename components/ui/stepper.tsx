@@ -25,10 +25,10 @@ type DefineStepperProps<Steps extends Stepperize.Step[]> = Omit<
       Omit<React.ComponentProps<"div">, "children"> &
       StepperConfig & {
         children:
-          | React.ReactNode
-          | ((props: {
-              methods: Stepperize.Stepper<Steps>;
-            }) => React.ReactNode);
+        | React.ReactNode
+        | ((props: {
+          methods: Stepperize.Stepper<Steps>;
+        }) => React.ReactNode);
       },
   ) => React.ReactElement;
   StepperNavigation: (props: React.ComponentProps<"nav">) => React.ReactElement;
@@ -88,8 +88,8 @@ const defineStepper = <const Steps extends Stepperize.Step[]>(
     ...props
   }: Omit<React.ComponentProps<"div">, "children"> & {
     children:
-      | React.ReactNode
-      | ((props: { methods: Stepperize.Stepper<Steps> }) => React.ReactNode);
+    | React.ReactNode
+    | ((props: { methods: Stepperize.Stepper<Steps> }) => React.ReactNode);
   }) => {
     const methods = useStepper();
 
