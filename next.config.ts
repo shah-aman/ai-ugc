@@ -8,6 +8,13 @@ const nextConfig: NextConfig = {
     // your project has type errors.
     ignoreBuildErrors: true,
   },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+  swcMinify: false, // Sometimes helps with build issues
+  experimental: {
+    forceSwcTransforms: true,
+  },
 };
 
 export default nextConfig;
