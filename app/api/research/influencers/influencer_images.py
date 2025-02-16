@@ -27,9 +27,14 @@ def fetch_image_url(name: str) -> Optional[str]:
     }
     
     params = {
-        "q": f"{name} profile picture",
+        "q": f"{name}",  # Simplified query for testing
         "count": 1
     }
+    
+    print(f"\nDebug info for {name}:")
+    print(f"API Key being used: {BRAVE_API_KEY[:5]}...")
+    print(f"Full URL: {BRAVE_SEARCH_URL}?q={params['q']}")
+    print(f"Headers: {headers}")
     
     try:
         # Rate limiting - sleep for 1.1 seconds between requests
@@ -41,6 +46,9 @@ def fetch_image_url(name: str) -> Optional[str]:
             params=params
         )
         
+        print(f"Response status code: {response.status_code}")
+        print(f"Response headers: {dict(response.headers)}")
+        
         if response.status_code == 403:
             print(f"Authentication error. Please check your Brave API key. Status: {response.status_code}")
             print(f"Response: {response.text}")
@@ -49,7 +57,7 @@ def fetch_image_url(name: str) -> Optional[str]:
         response.raise_for_status()
         
         results = response.json()
-        print(f"API Response for {name}:", results)  # Debug print
+        print(f"API Response for {name}:", results)
         
         # Extract URL from the correct location in the response
         if "results" in results and results["results"]:
@@ -84,18 +92,25 @@ def process_all_influencers():
     """
     Process all influencers in the database
     """
-    # Verify API key is set
+    # Verify API key is set and looks valid
     if not BRAVE_API_KEY:
         print("Error: BRAVE_API_KEY is not set in environment variables")
+        return
+    
+    if BRAVE_API_KEY == "your_brave_api_key_here":
+        print("Error: BRAVE_API_KEY appears to be the placeholder value. Please update with your actual API key")
         return
         
     print(f"Using Brave API key: {BRAVE_API_KEY[:10]}...")
     
-    # Test the API with a sample search
-    test_result = fetch_image_url("test")
+    # Test with a known good search term
+    print("\nTesting API with a simple query...")
+    test_result = fetch_image_url("Barack Obama")
     if test_result is None:
         print("Initial API test failed. Please check your API key and connection.")
         return
+    else:
+        print("Initial API test successful!")
     
     # Fetch all influencers from the database that don't have an image_url yet
     response = supabase.table("influencers").select("id, name").is_("image_url", None).execute()
