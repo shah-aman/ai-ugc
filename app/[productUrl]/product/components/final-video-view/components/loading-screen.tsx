@@ -46,7 +46,7 @@ export type LoadingScreenProps = {
 
 export function LoadingScreen({ loading, setLoading }: LoadingScreenProps) {
   return (
-    <div className="w-full h-[60vh] flex items-center justify-center">
+    <>
       {/* Core Loader Modal */}
       <Loader
         loadingStates={LOADING_STATES}
@@ -63,6 +63,9 @@ export function LoadingScreen({ loading, setLoading }: LoadingScreenProps) {
           <IconSquareRoundedX className="h-10 w-10" />
         </button>
       )}
-    </div>
+    </>
+  );
+  return (
+    <div className="w-full h-[60vh] flex items-center justify-center"></div>
   );
 }

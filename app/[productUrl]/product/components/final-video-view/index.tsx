@@ -41,8 +41,8 @@ export function FinalVideoView() {
 
   return (
     <>
-      <LoadingScreen loading={loading} setLoading={setLoading} />
       <div className="space-y-6">
+        <LoadingScreen loading={loading} setLoading={setLoading} />
         <div className="flex items-center justify-between">
           <div className="space-y-1">
             <h2 className="text-2xl font-medium">Final Video</h2>
