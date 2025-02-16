@@ -7,9 +7,9 @@ import {
   UseProductInfoQueryResult,
 } from "./modules/product-info";
 import {
-  useMarketResearch,
-  UseMarketResearchQueryResult,
-} from "./modules/market-research";
+  useProductResearch,
+  UseProductResearchQueryResult,
+} from "./modules/product-research";
 import {
   useStoryboard,
   UseStoryboardQueryResult,
@@ -20,10 +20,15 @@ import {
 } from "./modules/intermediate-video";
 import { useFinalVideo, UseFinalVideoQueryResult } from "./modules/final-video";
 import { objectToMarkdownPromptRecursive } from "./modules/storyboarding/utils/prompt";
+import {
+  useInfluencerResearch,
+  UseInfluencerResearchQueryResult,
+} from "./modules/influencer-research";
 
 export type ProductContextType = {
   product: UseProductInfoQueryResult;
-  marketResearch: UseMarketResearchQueryResult;
+  productResearch: UseProductResearchQueryResult;
+  influencerResearch: UseInfluencerResearchQueryResult;
   storyboard: UseStoryboardQueryResult;
   avatarId: string;
   setAvatarId: (id: string) => void;
@@ -37,7 +42,8 @@ export type ProductContextType = {
 
 const defaultContext: ProductContextType = {
   product: {} as UseProductInfoQueryResult,
-  marketResearch: {} as UseMarketResearchQueryResult,
+  productResearch: {} as UseProductResearchQueryResult,
+  influencerResearch: {} as UseInfluencerResearchQueryResult,
   storyboard: {} as UseStoryboardQueryResult,
   avatarId: "",
   setAvatarId: () => undefined,
@@ -60,15 +66,17 @@ export function ProductContextProvider({
 
   const product = useProductInfo({ productUrl });
 
-  const marketResearch = useMarketResearch({
+  const productResearch = useProductResearch({
     productDescription: product.data?.description ?? "",
   });
+
+  const influencerResearch = useInfluencerResearch();
 
   const storyboard = useStoryboard({
     customerIntent: "", // TODO: Add once done
     productResearch:
-      marketResearch.data !== undefined
-        ? objectToMarkdownPromptRecursive(marketResearch.data!)
+      productResearch.data !== undefined
+        ? objectToMarkdownPromptRecursive(productResearch.data!)
         : "", // TODO: Consider passing an object instead of markdown
     influencerResearch: "", // TODO: Add once done
     productLink: productUrl,
@@ -107,7 +115,8 @@ export function ProductContextProvider({
 
   const contextValue = {
     product,
-    marketResearch,
+    productResearch,
+    influencerResearch,
     storyboard,
     avatarId,
     setAvatarId,

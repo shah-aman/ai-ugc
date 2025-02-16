@@ -11,6 +11,7 @@ import {
   Users2,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import Fuse from "fuse.js";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -28,12 +29,13 @@ export function InfluencersView({ onNextStep }: InfluencersViewProps) {
   const {
     avatarId,
     setAvatarId,
-    marketResearch: { refetch, data },
+    influencerResearch: { data },
   } = useProductContext();
 
   useEffect(() => {
-    refetch();
-  }, [refetch]);
+    console.log(data);
+    console.log(Fuse);
+  }, [data]);
 
   return (
     <motion.div

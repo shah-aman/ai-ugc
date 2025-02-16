@@ -2,32 +2,20 @@ import { ConsolidatedResearch } from "@/app/api/research/product/types";
 
 import { useQuery, UseQueryResult } from "@tanstack/react-query";
 
-export type MarketResearch = {
-  productResearch: ConsolidatedResearch;
-  influencers: {
-    name: string;
-    avatar: string;
-    followers: string;
-    engagement: string;
-    socialMedia: {
-      [key: string]: string;
-    };
-    tags: string[];
-  }[];
-};
+export type ProductResearch = ConsolidatedResearch;
 
-export type UseMarketResearchQueryResult = UseQueryResult<
-  MarketResearch,
+export type UseProductResearchQueryResult = UseQueryResult<
+  ProductResearch,
   Error
 >;
 
-export type MarketResearchParams = {
+export type ProductResearchParams = {
   productDescription: string;
 };
 
 export async function fetchProductResearch({
   productDescription,
-}: MarketResearchParams): Promise<MarketResearch> {
+}: ProductResearchParams): Promise<ProductResearch> {
   const response = await fetch(`/api/research/product`, {
     method: "POST",
     body: JSON.stringify({ productDescription }),
@@ -35,14 +23,10 @@ export async function fetchProductResearch({
   if (!response.ok) {
     throw new Error("Network response was not ok");
   }
-  const productResearch = await response.json();
-  return {
-    productResearch,
-    influencers: {} as any,
-  };
+  return response.json();
 }
 
-export function useMarketResearch(params: MarketResearchParams) {
+export function useProductResearch(params: ProductResearchParams) {
   const query = useQuery({
     queryKey: ["product-description"],
     queryFn: () => fetchProductResearch(params),
