@@ -17,7 +17,7 @@ if (!process.env.FIRECRAWL_API_KEY) {
 
 export async function POST(request: Request) {
   const supabase = getSupabase();
-  
+
   try {
     const { url } = await request.json();
 
@@ -74,7 +74,8 @@ export async function POST(request: Request) {
           },
           {
             role: "user",
-            content: `Extract key product information from: ${markdown}. For images, focus on URLs from <img> tags that:
+            content:
+              `Extract key product information from: ${markdown}. For images, focus on URLs from <img> tags that:
             - Are within div elements with class="imgTagWrapper"
             - Have class="a-dynamic-image"
             - Have data-old-hires attributes (these often contain high-res versions)
@@ -197,6 +198,7 @@ export async function POST(request: Request) {
       };
 
       // Validate the data against our schema
+      console.log("Validating data against schema:", extractedInfo);
       const validatedData = productSchema.parse(extractedInfo);
 
       const { data: researchRecord, error: supabaseError } = await supabase
@@ -236,10 +238,9 @@ export async function POST(request: Request) {
       return NextResponse.json(
         {
           error: "Processing failed",
-          details:
-            scrapeError instanceof Error
-              ? scrapeError.message
-              : String(scrapeError),
+          details: scrapeError instanceof Error
+            ? scrapeError.message
+            : String(scrapeError),
         },
         { status: 500 },
       );

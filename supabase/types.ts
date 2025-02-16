@@ -200,6 +200,7 @@ export type Database = {
           product_link: string
           raw_video_link: string | null
           script_reasoning: string | null
+          state: number | null
           structured_script: Json[] | null
           updated_at: string
         }
@@ -214,6 +215,7 @@ export type Database = {
           product_link: string
           raw_video_link?: string | null
           script_reasoning?: string | null
+          state?: number | null
           structured_script?: Json[] | null
           updated_at?: string
         }
@@ -228,6 +230,7 @@ export type Database = {
           product_link?: string
           raw_video_link?: string | null
           script_reasoning?: string | null
+          state?: number | null
           structured_script?: Json[] | null
           updated_at?: string
         }

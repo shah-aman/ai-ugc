@@ -32,6 +32,38 @@ export async function POST(request: Request) {
       );
     }
 
+    const supabase = getSupabase();
+
+    // Check for existing script with same product and influencer
+    const { data: existingScript, error: fetchError } = await supabase
+      .from("scripts")
+      .select("*")
+      .eq("product_link", productLink)
+      .eq("influencer_id", influencerId)
+      .maybeSingle();
+
+    if (fetchError) {
+      console.error("Error checking for existing script:", fetchError);
+      return NextResponse.json(
+        { error: "Failed to check for existing script" },
+        { status: 500 },
+      );
+    }
+
+    // If we found an existing script, return it
+    if (existingScript) {
+      console.log("Found existing script for:", {
+        productLink,
+        influencerId,
+      });
+      return NextResponse.json(existingScript);
+    }
+
+    // No existing script found, generate a new one
+    console.log("Generating new script for:", {
+      productLink,
+      influencerId,
+    });
     const script = await generateScript(
       customerIntent,
       productResearch,
@@ -42,14 +74,14 @@ export async function POST(request: Request) {
       .map((script) => script.content)
       .join("\n");
 
-    const supabase = getSupabase();
+    // Store the new script
     const { data, error } = await supabase
       .from("scripts")
       .upsert({
         influencer_id: influencerId,
         product_link: productLink,
         structured_script: script.script,
-        full_script: fullScript
+        full_script: fullScript,
       })
       .select();
 

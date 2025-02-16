@@ -182,11 +182,6 @@ export async function joinVideos(
             );
         }
 
-        console.log(
-            "Available b-roll files:",
-            files.map((f) => f.name),
-        );
-
         const brollPaths = await Promise.all(
             brollVideos.map(async (brollPath, index) => {
                 // Clean up the path - remove any URL components and get just the filename

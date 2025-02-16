@@ -220,218 +220,264 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log("Generating main video with HeyGen...");
-    const generateResponse = await generateVideo({
-      script: full_script,
-      avatarId: influencerData.new_avatar_id,
-      voiceId: voice_id,
-    });
-    const videoId = generateResponse.data.video_id;
-    if (!videoId) {
-      console.error("No video ID returned from HeyGen");
-      return NextResponse.json(
-        { error: "Failed to generate video" },
-        {
-          status: 500,
-        },
-      );
-    }
-    console.log("Starting parallel video processing...", videoId);
-    const [videoObj, brollVideos] = await Promise.all([
-      pollVideoStatus(videoId, true, 1000 * 60 * 5),
-      generateBRollVideos(image_url, {
-        script: structured_script,
-      } as ExtractStructuredScriptSchema),
-    ]);
+    let mainVideoUrl: string | null = null;
+    let brollVideoUrls: string[] = [];
 
-    console.log("Video generation complete:", {
-      hasMainVideo: !!videoObj.video_url,
-      brollCount: brollVideos.length,
-    });
+    if (!scriptRow.state || scriptRow.state < 1) {
+      console.log("Generating main video with HeyGen...");
+      const generateResponse = await generateVideo({
+        script: full_script,
+        avatarId: influencerData.new_avatar_id,
+        voiceId: voice_id,
+      });
+      const videoId = generateResponse.data.video_id;
+      if (!videoId) {
+        console.error("No video ID returned from HeyGen");
+        return NextResponse.json(
+          { error: "Failed to generate video" },
+          {
+            status: 500,
+          },
+        );
+      }
+      console.log("Starting parallel video processing...", videoId);
+      const [videoObj, brollVideos] = await Promise.all([
+        pollVideoStatus(videoId, true, 1000 * 60 * 5),
+        generateBRollVideos(image_url, {
+          script: structured_script,
+        } as ExtractStructuredScriptSchema),
+      ]);
 
-    const videoUrl: string | undefined | null = videoObj.video_url;
-
-    if (!videoUrl) {
-      console.error("No video URL returned from HeyGen");
-      return NextResponse.json(
-        { error: "Failed to generate video" },
-        {
-          status: 500,
-        },
-      );
-    }
-
-    console.log("Uploading B-roll videos to storage...");
-    // Upload videos and store metadata
-    const brollVideoUrls = await Promise.all(
-      brollVideos.map(async (video) => {
-        console.log("Processing B-roll video:", video.filename);
-        // Upload to storage
-        const { error: uploadError } = await supabase.storage
-          .from("b-roll")
-          .upload(video.filename, video.videoBuffer, {
-            contentType: "video/mp4",
-            upsert: true,
-          });
-
-        if (uploadError) {
-          console.error("Failed to upload B-roll:", uploadError);
-          throw new Error(`Failed to upload video: ${uploadError.message}`);
-        }
-
-        // Get public URL
-        const { data: urlData } = supabase.storage
-          .from("b-roll")
-          .getPublicUrl(video.filename);
-
-        console.log("Storing B-roll metadata in database...");
-        // Store in database
-        const { error: dbError } = await supabase.from("b_roll").insert({
-          product_link,
-          description: video.description,
-          video_link: urlData.publicUrl,
-        });
-
-        if (dbError) {
-          console.error("Failed to store B-roll data:", dbError);
-          throw new Error(`Failed to store B-roll data: ${dbError.message}`);
-        }
-
-        return urlData.publicUrl;
-      }),
-    );
-
-    console.log("Downloading and uploading main video...");
-    // Download video from HeyGen and upload to Supabase storage
-    const videoResponse = await fetch(videoUrl);
-    const videoBlob = await videoResponse.blob();
-
-    const fileName = `${videoId}.mp4`;
-    const { error: storageError } = await supabase.storage
-      .from("raw-videos")
-      .upload(fileName, videoBlob, {
-        contentType: "video/mp4",
-        upsert: true,
+      console.log("Video generation complete:", {
+        hasMainVideo: !!videoObj.video_url,
+        brollCount: brollVideos.length,
       });
 
-    if (storageError) {
-      console.error("Failed to upload main video to storage:", storageError);
-      throw new Error("Failed to upload video to storage");
-    }
+      const videoUrl: string | undefined | null = videoObj.video_url;
 
-    console.log("Main video uploaded, getting public URL...");
-    const { data: publicUrl } = supabase.storage
-      .from("raw-videos")
-      .getPublicUrl(fileName);
+      if (!videoUrl) {
+        console.error("No video URL returned from HeyGen");
+        return NextResponse.json(
+          { error: "Failed to generate video" },
+          {
+            status: 500,
+          },
+        );
+      }
 
-    const { error: videoError } = await supabase
-      .from("scripts")
-      .update({
-        raw_video_link: publicUrl.publicUrl,
-      })
-      .eq("id", scriptId)
-      .select();
+      console.log("Uploading B-roll videos to storage...");
+      // Upload videos and store metadata
+      brollVideoUrls = await Promise.all(
+        brollVideos.map(async (video) => {
+          console.log("Processing B-roll video:", video.filename);
+          // Upload to storage
+          const { error: uploadError } = await supabase.storage
+            .from("b-roll")
+            .upload(video.filename, video.videoBuffer, {
+              contentType: "video/mp4",
+              upsert: true,
+            });
 
-    if (videoError) {
-      console.error("Failed to update video link in database:", videoError);
-      throw new Error("Failed to update video link in database");
+          if (uploadError) {
+            console.error("Failed to upload B-roll:", uploadError);
+            throw new Error(`Failed to upload video: ${uploadError.message}`);
+          }
+
+          // Get public URL
+          const { data: urlData } = supabase.storage
+            .from("b-roll")
+            .getPublicUrl(video.filename);
+
+          console.log("Storing B-roll metadata in database...");
+          // Store in database
+          const { error: dbError } = await supabase.from("b_roll").insert({
+            product_link,
+            description: video.description,
+            video_link: urlData.publicUrl,
+          });
+
+          if (dbError) {
+            console.error("Failed to store B-roll data:", dbError);
+            throw new Error(`Failed to store B-roll data: ${dbError.message}`);
+          }
+
+          return urlData.publicUrl;
+        }),
+      );
+
+      console.log("Downloading and uploading main video...");
+      // Download video from HeyGen and upload to Supabase storage
+      const videoResponse = await fetch(videoUrl);
+      const videoBlob = await videoResponse.blob();
+
+      const fileName = `${videoId}.mp4`;
+      const { error: storageError } = await supabase.storage
+        .from("raw-videos")
+        .upload(fileName, videoBlob, {
+          contentType: "video/mp4",
+          upsert: true,
+        });
+
+      if (storageError) {
+        console.error("Failed to upload main video to storage:", storageError);
+        throw new Error("Failed to upload video to storage");
+      }
+
+      console.log("Main video uploaded, getting public URL...");
+      const { data: publicUrl } = supabase.storage
+        .from("raw-videos")
+        .getPublicUrl(fileName);
+
+      const { error: videoError } = await supabase
+        .from("scripts")
+        .update({
+          raw_video_link: publicUrl.publicUrl,
+        })
+        .eq("id", scriptId)
+        .select();
+
+      if (videoError) {
+        console.error("Failed to update video link in database:", videoError);
+        throw new Error("Failed to update video link in database");
+      }
+
+      mainVideoUrl = publicUrl.publicUrl;
+
+      await supabase
+        .from("scripts")
+        .update({
+          state: 1,
+          raw_video_link: publicUrl.publicUrl,
+          b_roll_used: brollVideoUrls,
+        })
+        .eq("id", scriptId);
+
+      scriptRow.state = 1;
+    } else {
+      mainVideoUrl = scriptRow.raw_video_link;
+      brollVideoUrls = scriptRow.b_roll_used;
     }
 
     console.log("Starting video join process...");
     // JOIN VIDEOS
-    const mainVideoUrl = publicUrl.publicUrl;
     const dimensions = { width: 720, height: 1280 };
 
-    const {
-      url: processed_video_link,
-      error: joinVideosError,
-      // scriptSegmentsWithTimestamps,
-    } = await joinVideos(
-      mainVideoUrl,
-      { script: structured_script } as ExtractStructuredScriptSchema,
-      brollVideoUrls,
-      dimensions,
-    );
+    let joined_video_link: string | null = null;
 
-    if (joinVideosError) {
-      console.error("Failed to join videos:", joinVideosError);
-      throw new Error("Failed to join videos");
-    }
+    if (scriptRow.state == 1) {
+      const {
+        url: processed_video_link,
+        error: joinVideosError,
+        // scriptSegmentsWithTimestamps,
+      } = await joinVideos(
+        mainVideoUrl!,
+        { script: structured_script } as ExtractStructuredScriptSchema,
+        brollVideoUrls,
+        dimensions,
+      );
 
-    console.log("Videos joined successfully, updating script...");
-    const { error: updateError } = await supabase
-      .from("scripts")
-      .update({
-        processed_video_link,
-        // structured_script: scriptSegmentsWithTimestamps,
-        b_roll_used: brollVideoUrls,
-      })
-      .eq("id", scriptId);
+      if (joinVideosError) {
+        console.error("Failed to join videos:", joinVideosError);
+        throw new Error("Failed to join videos");
+      }
 
-    if (updateError) {
-      console.error("Failed to update script with joined video:", updateError);
-      throw new Error(`Failed to update script: ${updateError.message}`);
+      console.log("Videos joined successfully, updating script...");
+      const { error: updateError } = await supabase
+        .from("scripts")
+        .update({
+          processed_video_link,
+          // structured_script: scriptSegmentsWithTimestamps,
+          b_roll_used: brollVideoUrls,
+          state: 2,
+        })
+        .eq("id", scriptId);
+
+      if (updateError) {
+        console.error(
+          "Failed to update script with joined video:",
+          updateError,
+        );
+        throw new Error(`Failed to update script: ${updateError.message}`);
+      }
+
+      scriptRow.state = 2;
+      joined_video_link = processed_video_link;
+    } else {
+      joined_video_link = scriptRow.processed_video_link;
     }
 
     console.log("Generating captions with Zapcap...");
-    const { videoBuffer: captionedVideoBuffer, error: zapcapError } =
-      await generateZapcap(processed_video_link, zapcapTemplateId);
 
-    if (zapcapError || !captionedVideoBuffer) {
-      console.error("Failed to generate captions:", zapcapError);
-      throw new Error("Failed to generate zapcap");
-    }
+    let captioned_video_link: string | null = null;
 
-    console.log("Uploading captioned video...");
-    // Upload to Supabase storage
-    const filename = `zapcap-${Date.now()}.mp4`;
+    if (scriptRow.state == 2) {
+      const { videoBuffer: captionedVideoBuffer, error: zapcapError } =
+        await generateZapcap(joined_video_link!, zapcapTemplateId);
 
-    const { error: uploadError } = await supabase.storage
-      .from("subtitled-videos")
-      .upload(filename, captionedVideoBuffer, {
-        contentType: "video/mp4",
-        upsert: true,
-      });
+      if (zapcapError || !captionedVideoBuffer) {
+        console.error("Failed to generate captions:", zapcapError);
+        throw new Error("Failed to generate zapcap");
+      }
 
-    if (uploadError) {
-      console.error("Failed to upload captioned video:", uploadError);
-      return NextResponse.json(
-        { error: `Failed to upload video: ${uploadError.message}` },
-        { status: 500 },
-      );
-    }
+      console.log("Uploading captioned video...");
+      // Upload to Supabase storage
+      const filename = `zapcap-${Date.now()}.mp4`;
 
-    console.log("Getting final video URL...");
-    // Get public URL
-    const { data: urlData } = supabase.storage
-      .from("subtitled-videos")
-      .getPublicUrl(filename);
+      const { error: uploadError } = await supabase.storage
+        .from("subtitled-videos")
+        .upload(filename, captionedVideoBuffer, {
+          contentType: "video/mp4",
+          upsert: true,
+        });
 
-    // Update scripts table
-    const { error: scriptsUpdateError } = await supabase
-      .from("scripts")
-      .update({ processed_video_link: urlData.publicUrl })
-      .eq("id", scriptId);
+      if (uploadError) {
+        console.error("Failed to upload captioned video:", uploadError);
+        return NextResponse.json(
+          { error: `Failed to upload video: ${uploadError.message}` },
+          { status: 500 },
+        );
+      }
 
-    if (scriptsUpdateError) {
-      console.error(
-        "Failed to update script with final video:",
-        scriptsUpdateError,
-      );
-      return NextResponse.json(
-        { error: `Failed to update script: ${scriptsUpdateError.message}` },
-        { status: 500 },
-      );
+      console.log("Getting final video URL...");
+      // Get public URL
+      const { data: urlData } = supabase.storage
+        .from("subtitled-videos")
+        .getPublicUrl(filename);
+
+      // Update scripts table
+      const { error: scriptsUpdateError } = await supabase
+        .from("scripts")
+        .update({
+          processed_video_link: urlData.publicUrl,
+          state: 3,
+        })
+        .eq("id", scriptId);
+
+      if (scriptsUpdateError) {
+        console.error(
+          "Failed to update script with final video:",
+          scriptsUpdateError,
+        );
+        return NextResponse.json(
+          { error: `Failed to update script: ${scriptsUpdateError.message}` },
+          { status: 500 },
+        );
+      }
+
+      scriptRow.state = 3;
+      captioned_video_link = urlData.publicUrl;
+    } else {
+      captioned_video_link = scriptRow.processed_video_link;
     }
 
     console.log("Video generation process complete!");
 
     // Get video details before sending the response
-    const videoDetails = await getVideoDetails(urlData.publicUrl);
+    const videoDetails = await getVideoDetails(captioned_video_link!);
 
     return NextResponse.json({
       success: true,
-      video_url: urlData.publicUrl,
+      video_url: captioned_video_link!,
       video_details: videoDetails,
     });
   } catch (error) {
