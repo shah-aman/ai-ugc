@@ -8,8 +8,16 @@ import { ExtractStructuredScriptSchema } from "../../script/generate/schemas";
 import RunwayML from "@runwayml/sdk";
 import { joinVideos } from "../../join/services";
 import { generateZapcap } from "../../zapcap/generate/services";
+import { promises as fs } from "fs";
+import os from "os";
+import path from "path";
+import util from "util";
+import { exec } from "child_process";
+import mime from "mime-types";
 
 // type ScriptRow = Database["public"]["Tables"]["scripts"]["Row"];
+
+const execPromise = util.promisify(exec);
 
 if (!process.env.HEYGEN_API_KEY) {
   throw new Error("HEYGEN_API_KEY is not set");
@@ -19,6 +27,73 @@ export type RequestBody = {
   scriptId: string;
   zapcapTemplateId: string;
 };
+
+async function getVideoDetails(videoUrl: string) {
+  try {
+    // Download the video file
+    const response = await fetch(videoUrl);
+    if (!response.ok) {
+      throw new Error("Failed to fetch video");
+    }
+    const buffer = Buffer.from(await response.arrayBuffer());
+
+    // Get file format
+    const contentType = response.headers.get("content-type");
+    const urlExtension = path.extname(new URL(videoUrl).pathname).toLowerCase();
+    let fileFormat = urlExtension.slice(1);
+    if (!fileFormat && contentType) {
+      fileFormat = mime.extension(contentType) || "";
+    }
+
+    // Create temp directory and save video
+    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "video-details-"));
+    const tempFilePath = path.join(tempDir, "video.tmp");
+    await fs.writeFile(tempFilePath, buffer);
+
+    // Get video details using ffprobe
+    const ffprobeCommand =
+      `ffprobe -v quiet -print_format json -show_format -show_streams "${tempFilePath}"`;
+    const { stdout } = await execPromise(ffprobeCommand);
+    const probeData = JSON.parse(stdout);
+
+    // Clean up temp files
+    await fs.rm(tempDir, { recursive: true, force: true });
+
+    // Extract video details
+    const format = probeData.format;
+    const duration = parseFloat(format.duration);
+
+    const videoStream = probeData.streams.find(
+      (s: { codec_type: string }) => s.codec_type === "video",
+    );
+    if (!videoStream) {
+      throw new Error("No video stream found");
+    }
+
+    const width = videoStream.width;
+    const height = videoStream.height;
+
+    // Calculate framerate
+    const rFrameRate = videoStream.r_frame_rate;
+    let framerate = 0;
+    if (rFrameRate && typeof rFrameRate === "string") {
+      const [num, den] = rFrameRate.split("/").map(parseFloat);
+      if (den !== 0) {
+        framerate = num / den;
+      }
+    }
+
+    return {
+      duration,
+      fileFormat: fileFormat.toLowerCase(),
+      framerate,
+      resolution: `${width} x ${height}`,
+    };
+  } catch (error) {
+    console.error("Error getting video details:", error);
+    return null;
+  }
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -364,9 +439,14 @@ export async function POST(request: NextRequest) {
     }
 
     console.log("Video generation process complete!");
+
+    // Get video details before sending the response
+    const videoDetails = await getVideoDetails(urlData.publicUrl);
+
     return NextResponse.json({
       success: true,
       video_url: urlData.publicUrl,
+      video_details: videoDetails,
     });
   } catch (error) {
     console.error("Fatal error in video generation:", error);
