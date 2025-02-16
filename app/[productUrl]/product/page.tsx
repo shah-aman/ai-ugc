@@ -108,7 +108,9 @@ export default function StepperDemo() {
                 "market-strategy": () => (
                   <MarketStrategyView onNextStep={methods.next} />
                 ),
-                influencers: () => <InfluencersView />,
+                influencers: () => (
+                  <InfluencersView onNextStep={methods.next} />
+                ),
                 storyboard: () => <StoryboardView />,
                 "raw-video": () => <IntermediateVideoView />,
                 "final-video": () => <FinalVideoView />,
