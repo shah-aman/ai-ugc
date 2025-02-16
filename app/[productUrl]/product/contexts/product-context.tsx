@@ -24,7 +24,7 @@ import {
   useInfluencerResearch,
   UseInfluencerResearchQueryResult,
 } from "./modules/influencer-research";
-import { ExtractStructuredScriptSchema } from "@/app/api/script/generate/schemas";
+// import { ExtractStructuredScriptSchema } from "@/app/api/script/generate/schemas";
 
 export type ProductContextType = {
   product: UseProductInfoQueryResult;
@@ -114,7 +114,7 @@ export function ProductContextProvider({
 
   const finalVideo = useFinalVideo({
     scriptId: storyboard.data?.id ?? "",
-    zapcapTemplateId: "",
+    zapcapTemplateId: "9a2b0ed5-231b-4052-9211-5af9dc2de65e",
   });
 
   // const handleSceneChange = (sceneIndex: number) => {
