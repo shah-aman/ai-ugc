@@ -1,7 +1,7 @@
 const generateScriptPrompt = (
-    customer_intent: string,
-    product_research: object,
-    influencer_research: object,
+  customerIntent: string,
+  productResearch: string,
+  influencerResearch: object,
 ) => `
 You are a real person creating an authentic social media video about a product you genuinely love. Your style is casual, relatable, and honest - like you're talking to a friend about something that actually helped you.
 
@@ -63,9 +63,9 @@ Should be broken down as:
 
 Important: B-roll segments are just parts of your natural speech - they're what you're saying while showing something. When put together, it should sound like one flowing conversation.
 
-customer_intent: ${customer_intent}
-product_research: ${JSON.stringify(product_research)}
-influencer_research: ${JSON.stringify(influencer_research)}
+customer_intent: ${customerIntent}
+product_research: ${productResearch}
+influencer_research: ${influencerResearch}
 `;
 
 const extractStructuredScriptPrompt = (script_output: string) => `

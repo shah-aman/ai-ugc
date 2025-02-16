@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import * as React from "react"
+import * as React from "react";
 import {
   AudioWaveform,
   Command,
@@ -8,9 +8,9 @@ import {
   GlobeIcon,
   LibraryBig,
   Users,
-} from "lucide-react"
+} from "lucide-react";
 import { GiSpikyExplosion } from "react-icons/gi";
-import { NavMain } from "@/components/nav-main"
+import { NavMain } from "@/components/nav-main";
 // import { NavUser } from "@/components/nav-user"
 import {
   Sidebar,
@@ -18,13 +18,13 @@ import {
   SidebarFooter,
   SidebarHeader,
   SidebarRail,
-} from "@/components/ui/sidebar"
-import { Separator } from "@/components/ui/separator"
+} from "@/components/ui/sidebar";
+import { Separator } from "@/components/ui/separator";
 // import { useAuth } from "@/lib/auth-context"
-import { Instrument_Serif } from 'next/font/google';
-import { usePathname } from 'next/navigation'
+import { Instrument_Serif } from "next/font/google";
+import { usePathname } from "next/navigation";
 
-const instrumentSerif = Instrument_Serif({ weight: "400", subsets: ['latin'] });
+const instrumentSerif = Instrument_Serif({ weight: "400", subsets: ["latin"] });
 
 const data = {
   teams: [
@@ -48,17 +48,17 @@ const data = {
     {
       title: "Home",
       url: "/",
-      icon: GlobeIcon
+      icon: GlobeIcon,
     },
     {
       title: "Content Library",
       url: "/content-library",
-      icon: LibraryBig
+      icon: LibraryBig,
     },
     {
       title: "Influencers",
       url: "/influencers",
-      icon: Users
+      icon: Users,
     },
     // {
     //   title: "Market",
@@ -92,18 +92,18 @@ const data = {
     //   ],
     // },
   ],
-}
+};
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   // const { user } = useAuth()
-  const pathname = usePathname()
+  const pathname = usePathname();
 
-  console.log('Current pathname:', pathname)
-  const items = data.navMain.map(item => ({
+  // console.log('Current pathname:', pathname)
+  const items = data.navMain.map((item) => ({
     ...item,
-    isActive: pathname === item.url
-  }))
-  console.log('Nav items with active state:', items)
+    isActive: pathname === item.url,
+  }));
+  // console.log('Nav items with active state:', items)
 
   return (
     <Sidebar collapsible="icon" {...props}>
@@ -112,7 +112,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <div className="flex items-center justify-center w-8 h-8 transition-all duration-300 ease-in-out">
             <GiSpikyExplosion className="h-6 w-6 bg-fuchsia-500 text-white p-1 rounded-md transition-all duration-300 ease-in-out" />
           </div>
-          <span className={`${instrumentSerif.className} font-light text-2xl text-fuchsia-400 opacity-100 transition-all duration-300 ease-in-out group-data-[state=collapsed]:hidden`}>
+          <span
+            className={`${instrumentSerif.className} font-light text-2xl text-fuchsia-400 opacity-100 transition-all duration-300 ease-in-out group-data-[state=collapsed]:hidden`}
+          >
             supernova
           </span>
         </div>
@@ -140,5 +142,5 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
-  )
+  );
 }

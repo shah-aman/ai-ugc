@@ -65,7 +65,7 @@ type CircleStepIndicatorProps = {
 
 const StepperContext = React.createContext<StepperConfig | null>(null);
 
-const useStepperProvider = (): StepperConfig => {
+export const useStepperProvider = (): StepperConfig => {
   const context = React.useContext(StepperContext);
   if (!context) {
     throw new Error("useStepper must be used within a StepperProvider.");

@@ -7,9 +7,9 @@ import {
 import { zodResponseFormat } from "openai/helpers/zod";
 
 export async function generateScript(
-  customer_intent: string,
-  product_research: object,
-  influencer_research: object,
+  customerIntent: string,
+  productResearch: string,
+  influencerResearch: object,
 ): Promise<{
   unstructuredScript: string;
   structuredScript: ExtractStructuredScriptSchema;
@@ -22,9 +22,9 @@ export async function generateScript(
       {
         role: "user",
         content: generateScriptPrompt(
-          customer_intent,
-          product_research,
-          influencer_research,
+          customerIntent,
+          productResearch,
+          influencerResearch,
         ),
       },
     ],
@@ -46,10 +46,7 @@ export async function generateScript(
         content: extractStructuredScriptPrompt(unstructuredScript),
       },
     ],
-    response_format: zodResponseFormat(
-      extractStructuredScriptSchema,
-      "script",
-    ),
+    response_format: zodResponseFormat(extractStructuredScriptSchema, "script"),
   });
 
   const structuredScript = structuredResponse.choices[0].message.parsed;
