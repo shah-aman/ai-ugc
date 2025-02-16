@@ -51,7 +51,8 @@ async function getVideoDetails(videoUrl: string) {
     await fs.writeFile(tempFilePath, buffer);
 
     // Get video details using ffprobe
-    const ffprobeCommand = `ffprobe -v quiet -print_format json -show_format -show_streams "${tempFilePath}"`;
+    const ffprobeCommand =
+      `ffprobe -v quiet -print_format json -show_format -show_streams "${tempFilePath}"`;
     const { stdout } = await execPromise(ffprobeCommand);
     const probeData = JSON.parse(stdout);
 
@@ -206,8 +207,11 @@ export async function POST(request: NextRequest) {
 
     console.log("Image URL:", image_url);
 
-    if (!avatar_id || !voice_id) {
-      console.error("Missing avatar or voice ID:", { avatar_id, voice_id });
+    if (!influencerData.new_avatar_id || !voice_id) {
+      console.error("Missing avatar or voice ID:", {
+        avatar_id: influencerData.new_avatar_id,
+        voice_id,
+      });
       return NextResponse.json(
         {
           error: "Influencer avatar_id or voice_id is missing",
@@ -219,7 +223,7 @@ export async function POST(request: NextRequest) {
     console.log("Generating main video with HeyGen...");
     const generateResponse = await generateVideo({
       script: full_script,
-      avatarId: avatar_id,
+      avatarId: influencerData.new_avatar_id,
       voiceId: voice_id,
     });
     const videoId = generateResponse.data.video_id;
