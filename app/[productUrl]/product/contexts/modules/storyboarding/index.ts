@@ -1,21 +1,20 @@
-import { ExtractStructuredScriptSchema } from "@/app/api/script/generate/schemas";
+import { RequestBody } from "@/app/api/script/generate/route";
+import { Database } from "@/supabase/types";
 
 import { useQuery, UseQueryResult } from "@tanstack/react-query";
 
-export type Storyboard = ExtractStructuredScriptSchema;
+export type Storyboard = Database["public"]["Tables"]["scripts"]["Row"];
 
 export type UseStoryboardQueryResult = UseQueryResult<Storyboard, Error>;
 
-export type StoryboardParams = {
-  customerIntent: string;
-  productResearch: string;
-  influencerResearch: string;
-};
+export type StoryboardParams = RequestBody;
 
 export async function fetchStoryboard({
   customerIntent,
   productResearch,
   influencerResearch,
+  productLink,
+  influencerId,
 }: StoryboardParams): Promise<Storyboard> {
   const response = await fetch(`/api/script/generate`, {
     method: "POST",
@@ -23,6 +22,8 @@ export async function fetchStoryboard({
       customerIntent,
       productResearch,
       influencerResearch,
+      productLink,
+      influencerId,
     }),
   });
   if (!response.ok) {

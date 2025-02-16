@@ -61,7 +61,8 @@ export async function POST(request: Request) {
             Ignore any images outside these main product image containers.`,
           },
         ],
-        model: "llama-3.3-70b-versatile",
+        // model: "llama-3.3-70b-versatile", // TODO: Reenable after fixing API key
+        model: "llama-3.1-8b-instant",
         temperature: 0.1,
         max_tokens: 1024,
         tools: [

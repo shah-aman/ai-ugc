@@ -49,6 +49,7 @@ export function StoryboardView({ onNextStep }: StoryboardViewProps) {
             size="sm"
             className="bg-fuchsia-500 hover:bg-fuchsia-600 text-white text-xs gap-2"
             disabled={data === undefined}
+            onClick={onNextStep}
           >
             <Play className="w-4 h-4" />
             Preview
@@ -61,7 +62,7 @@ export function StoryboardView({ onNextStep }: StoryboardViewProps) {
       ) : (
         <div className="rounded-lg">
           <AdSceneList
-            scenes={data.script.map((scene, index) => ({
+            scenes={data.structured_script!.map((scene, index) => ({
               id: index,
               roll_type: scene.roll_type,
               content: scene.content,

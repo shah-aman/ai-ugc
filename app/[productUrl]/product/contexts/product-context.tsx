@@ -71,17 +71,21 @@ export function ProductContextProvider({
         ? objectToMarkdownPromptRecursive(marketResearch.data!)
         : "", // TODO: Consider passing an object instead of markdown
     influencerResearch: "", // TODO: Add once done
+    productLink: productUrl,
+    influencerId: "54e6c27f-c6dd-4ba0-9b69-823771ed49cd",
   });
+
+  console.log(storyboard.data);
 
   const [avatarId, setAvatarId] = useState<string>();
   const intermediateVideo = useIntermediateVideo({
     avatarId: avatarId ?? "",
     voiceId: "26b2064088674c80b1e5fc5ab1a068eb",
     script:
-      storyboard.data?.script
-        .map(
+      storyboard.data?.structured_script
+        ?.map(
           (scene) =>
-            `Roll type: ${scene.roll_type}\nDescription: ${scene.description}\nContent: "${scene.content}"`,
+            `Roll type: ${scene!.roll_type}\nDescription: ${scene!.description}\nContent: "${scene!.content}"`,
         )
         .join("\n\n") ?? "", // TODO: Improve the data being passed
   });
