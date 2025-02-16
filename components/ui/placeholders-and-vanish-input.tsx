@@ -96,7 +96,11 @@ export function PlaceholdersAndVanishInput({
       const rowOffset = 4 * y * 800;
       for (let x = 0; x < 800; x++) {
         const pixelOffset = rowOffset + 4 * x;
-        if (pixelData[pixelOffset] || pixelData[pixelOffset + 1] || pixelData[pixelOffset + 2]) {
+        if (
+          pixelData[pixelOffset] ||
+          pixelData[pixelOffset + 1] ||
+          pixelData[pixelOffset + 2]
+        ) {
           newData.push({
             x,
             y,
@@ -133,7 +137,7 @@ export function PlaceholdersAndVanishInput({
         if (!ctx) return;
 
         // Update particles
-        const updatedParticles = newDataRef.current.filter(particle => {
+        const updatedParticles = newDataRef.current.filter((particle) => {
           if (particle.x < pos) return true;
           if (particle.r <= 0) return false;
 
@@ -182,7 +186,7 @@ export function PlaceholdersAndVanishInput({
     setAnimating(true);
     draw();
 
-    const maxX = Math.max(...newDataRef.current.map(p => p.x), 0);
+    const maxX = Math.max(...newDataRef.current.map((p) => p.x), 0);
     animate(maxX);
   }, [value, draw, animate]);
 
@@ -199,7 +203,7 @@ export function PlaceholdersAndVanishInput({
         "bg-white/80 dark:bg-zinc-800/80 backdrop-blur-sm",
         "shadow-[0px_2px_3px_-1px_rgba(0,0,0,0.1),_0px_1px_0px_0px_rgba(25,28,33,0.02),_0px_0px_0px_1px_rgba(25,28,33,0.08)]",
         "transition duration-200 hover:shadow-md focus-within:shadow-md",
-        value && "bg-gray-50/80 dark:bg-zinc-900/80"
+        value && "bg-gray-50/80 dark:bg-zinc-900/80",
       )}
       onSubmit={handleSubmit}
     >
@@ -208,7 +212,7 @@ export function PlaceholdersAndVanishInput({
           "absolute pointer-events-none text-base transform scale-50 top-[20%] left-2 sm:left-8",
           "origin-top-left filter invert dark:invert-0 pr-20",
           animating ? "opacity-100" : "opacity-0",
-          "transition-opacity duration-200"
+          "transition-opacity duration-200",
         )}
         ref={canvasRef}
       />
@@ -233,7 +237,7 @@ export function PlaceholdersAndVanishInput({
           "pl-4 sm:pl-6 pr-28",
           "placeholder:text-muted-foreground/60",
           animating && "text-transparent dark:text-transparent",
-          "transition-colors duration-200"
+          "transition-colors duration-200",
         )}
       />
 
@@ -244,32 +248,32 @@ export function PlaceholdersAndVanishInput({
           "absolute right-2 top-1/2 -translate-y-1/2",
           "h-8 w-24 z-50 rounded-md",
           "transition-transform duration-200",
-          "hover:scale-[1.02] active:scale-[0.98]"
+          "hover:scale-[1.02] active:scale-[0.98]",
         )}
       >
         Generate
       </RainbowButton>
 
       <div className="absolute inset-0 flex items-center rounded-lg pointer-events-none">
-        <AnimatePresence mode="wait">
-          {!value && (
-            <motion.p
-              key={`placeholder-${currentPlaceholder}`}
-              initial={{ y: 5, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: -15, opacity: 0 }}
-              transition={{ duration: 0.3, ease: "easeOut" }}
-              className={cn(
-                "text-sm sm:text-base font-normal",
-                "text-neutral-500 dark:text-zinc-500",
-                "pl-4 sm:pl-6 text-left",
-                "w-[calc(100%-2rem)] truncate"
-              )}
-            >
-              {placeholders[currentPlaceholder]}
-            </motion.p>
-          )}
-        </AnimatePresence>
+        {/* <AnimatePresence mode="wait"> */}
+        {!value && (
+          <motion.p
+            key={`placeholder-${currentPlaceholder}`}
+            initial={{ y: 5, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: -15, opacity: 0 }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
+            className={cn(
+              "text-sm sm:text-base font-normal",
+              "text-neutral-500 dark:text-zinc-500",
+              "pl-4 sm:pl-6 text-left",
+              "w-[calc(100%-2rem)] truncate",
+            )}
+          >
+            {placeholders[currentPlaceholder]}
+          </motion.p>
+        )}
+        {/* </AnimatePresence> */}
       </div>
     </form>
   );
