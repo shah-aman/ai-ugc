@@ -3,9 +3,12 @@ import json
 from typing import TypedDict, List, Optional, Literal
 import httpx
 import asyncio
+from supabase import create_client, Client
 
 PERPLEXITY_API_KEY = os.getenv("PERPLEXITY_API_KEY")
 PERPLEXITY_API_URL = "https://api.perplexity.ai/chat/completions"
+SUPABASE_URL = os.getenv("NEXT_PUBLIC_SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
 
 class ContentData(TypedDict):
     mainCategories: List[str]
@@ -121,8 +124,13 @@ async def perform_specialized_research(
 
 async def research_influencer(name: str, tiktok_profile_link: str) -> dict:
     """
-    Research an influencer using multiple specialized API calls.
+    Research an influencer using multiple specialized API calls and store in Supabase.
     """
+    if not SUPABASE_URL or not SUPABASE_KEY:
+        raise ValueError("Supabase credentials not configured")
+        
+    supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+
     research_areas = [
         {
             "name": "content",
@@ -226,7 +234,7 @@ Format your response as JSON:
         target_audience = next(r for r in research_results if r["data"]["type"] == "targetAudience")
         key_topics = next(r for r in research_results if r["data"]["type"] == "keyTopics")
 
-        return {
+        result = {
             "content": content["data"]["data"],
             "background": background["data"]["data"],
             "targetAudience": target_audience["data"]["data"],
@@ -234,18 +242,75 @@ Format your response as JSON:
             "citations": unique_citations
         }
 
+        # Update the influencer record in Supabase
+        supabase.table("influencers").update({
+            "influencer_research": result
+        }).eq("name", name).execute()
+
+        return result
+
     except Exception as e:
         print(f"Error researching influencer {name}: {str(e)}")
+        raise
+
+async def research_all_influencers():
+    """
+    Research all influencers in the Supabase table that don't have research data.
+    """
+    if not SUPABASE_URL or not SUPABASE_KEY:
+        raise ValueError("Supabase credentials not configured")
+        
+    supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+    
+    try:
+        # Fetch only influencers without research data
+        response = supabase.table("influencers").select(
+            "id, name, tiktok_profile_link, influencer_research"
+        ).is_("influencer_research", "null").execute()
+        
+        influencers = response.data
+        
+        print(f"Found {len(influencers)} influencers that need research")
+        
+        for influencer in influencers:
+            max_retries = 3
+            retry_delay = 60  # Start with 1 minute delay
+            
+            for attempt in range(max_retries):
+                try:
+                    print(f"Researching {influencer['name']}... (attempt {attempt + 1}/{max_retries})")
+                    await research_influencer(
+                        name=influencer['name'],
+                        tiktok_profile_link=influencer['tiktok_profile_link']
+                    )
+                    print(f"Successfully researched {influencer['name']}")
+                    break
+                    
+                except Exception as e:
+                    error_str = str(e)
+                    if "rate limit" in error_str.lower():
+                        if attempt < max_retries - 1:
+                            print(f"Rate limited. Waiting {retry_delay} seconds before retry...")
+                            await asyncio.sleep(retry_delay)
+                            retry_delay *= 2  # Double the delay for next attempt
+                            continue
+                    
+                    print(f"Error researching {influencer['name']}: {error_str}")
+                    break
+            
+            # Optional: Add a small delay between influencers to avoid rate limits
+            await asyncio.sleep(5)
+                
+        print("Completed researching all influencers")
+        
+    except Exception as e:
+        print(f"Error fetching influencers: {str(e)}")
         raise
 
 if __name__ == "__main__":
     async def main():
         try:
-            result = await research_influencer(
-                "Gilmher Croes",
-                "https://www.tiktok.com/@gilmhercroes"
-            )
-            print(json.dumps(result, indent=2))
+            await research_all_influencers()
         except Exception as e:
             print(f"Error: {str(e)}")
 
