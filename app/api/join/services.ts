@@ -240,7 +240,13 @@ export async function joinVideos(
 
         // Process video with B-roll overlays (without audio)
         const processedVideoPath = path.join(tempDir, "processed_video.mp4");
-        let filterComplex = brollTimestamps.timestamps
+        // Slice the timestamps array so that only as many timestamps as there are B-roll videos are used.
+        const effectiveBRollTimestamps = brollTimestamps.timestamps.slice(
+            0,
+            brollVideos.length,
+        );
+
+        let filterComplex = effectiveBRollTimestamps
             .map(
                 (timestamp, index) => `
             [${
@@ -250,16 +256,19 @@ export async function joinVideos(
             )
             .join("");
 
-        const overlay = brollTimestamps.timestamps.reduce((acc, _, index) => {
-            const input = index === 0 ? "[0:v]" : `[tmp${index - 1}]`;
-            const output = index === brollTimestamps.timestamps.length - 1
-                ? "[outv]"
-                : `[tmp${index}]`;
-            return (
-                acc +
-                `${input}[v${index}]overlay=x=(W-w)/2:y=(H-h)/2:eof_action=pass${output};`
-            );
-        }, "");
+        const overlay = effectiveBRollTimestamps.reduce(
+            (acc, _unused, index) => {
+                const input = index === 0 ? "[0:v]" : `[tmp${index - 1}]`;
+                const output = index === effectiveBRollTimestamps.length - 1
+                    ? "[outv]"
+                    : `[tmp${index}]`;
+                return (
+                    acc +
+                    `${input}[v${index}]overlay=x=(W-w)/2:y=(H-h)/2:eof_action=pass${output};`
+                );
+            },
+            "",
+        );
 
         filterComplex += overlay;
 
